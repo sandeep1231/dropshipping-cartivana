@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" routerLink="/">Cartivana</a>
+  
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+        aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" routerLink="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/products">Products</a></li>
+  
+          <!-- Cart Link -->
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cart"><i class="bi bi-cart"></i> Cart</a>
+          </li>
+  
+          <!-- If User is Logged In -->
+          <li class="nav-item dropdown" *ngIf="auth.isLoggedIn(); else guestLinks">
+            <button class="nav-link dropdown-toggle btn btn-link" type="button"
+                id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ auth.getUser()?.name }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li *ngIf="auth.getUser()?.role === 'admin'"><a class="dropdown-item" routerLink="/admin">Admin Dashboard</a></li>
+              <li class="nav-item" *ngIf="auth.getUser()?.role === 'admin'">
+                <a class="nav-link" routerLink="/admin/overview">📊 Admin Dashboard Overview</a>
+              </li>
+              <li *ngIf="auth.getUser()?.role === 'supplier'"><a class="dropdown-item" routerLink="/supplier">Supplier Dashboard</a></li>
+              <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+              <li><a class="dropdown-item" routerLink="/my-orders">My Orders</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" (click)="logout()">Logout</a></li>
+            </ul>
+          </li>
+  
+          <!-- If User is Logged Out -->
+          <ng-template #guestLinks>
+            <li class="nav-item"><a class="nav-link" routerLink="/login">Login</a></li>
+          </ng-template>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  

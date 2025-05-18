@@ -1,0 +1,96 @@
+<div class="container mt-4">
+    <h2 class="mb-4">🛠️ Admin Dashboard</h2>
+  
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+          <h5>Total Users</h5>
+          <p class="display-6 fw-bold">243</p>
+        </div>
+      </div>
+  
+      <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+          <h5>Orders This Month</h5>
+          <p class="display-6 fw-bold">91</p>
+        </div>
+      </div>
+  
+      <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+          <h5>Total Products</h5>
+          <p class="display-6 fw-bold">58</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="mt-5">
+      <h5>Quick Links</h5>
+      <ul>
+        <li><a routerLink="/products">View Products</a></li>
+        <li><a routerLink="/admin/orders">Manage Orders</a></li>
+        <li><a routerLink="/admin/users">Manage Users</a></li>
+      </ul>
+    </div>
+
+    <div class="container mt-4">
+        <h4>🗂 All Products</h4>
+      
+        <div class="input-group mb-3">
+          <input type="text" [(ngModel)]="supplierFilter" class="form-control" placeholder="Filter by Supplier ID (optional)">
+          <button class="btn btn-outline-secondary" (click)="loadAllProducts()">Apply Filter</button>
+        </div>
+      
+        <div *ngIf="allProducts.length; else noProducts">
+          <div class="card mb-3 p-3" *ngFor="let product of allProducts">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6>{{ product.name }} (₹{{ product.price }})</h6>
+                <p class="text-muted mb-0">{{ product.category }}</p>
+                <small>Supplier: {{ product.supplier?.name }} ({{ product.supplier?._id }})</small>
+              </div>
+              <button class="btn btn-sm btn-warning me-2" (click)="toggleFeatured(product._id)">
+                {{ product.featured ? 'Unfeature' : 'Feature' }}
+              </button>
+              
+              <div>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <ng-template #noProducts>
+          <p class="text-muted">No products found.</p>
+        </ng-template>
+      </div>
+      
+      <div class="container mt-5">
+        <h4>📝 Pending Product Approvals</h4>
+      
+        <div *ngIf="pendingProducts.length; else noPending">
+          <div class="card mb-3 p-3" *ngFor="let product of pendingProducts">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6>{{ product.name }} (₹{{ product.price }})</h6>
+                <p class="text-muted mb-0">{{ product.category }}</p>
+                <small>Submitted by: {{ product.supplier?.name }} ({{ product.supplier?.email }})</small>
+              </div>
+              <div>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-success" (click)="approveProduct(product._id)">Approve</button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="rejectProduct(product._id)">Reject</button>
+                  </div>
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <ng-template #noPending>
+          <p class="text-muted">🎉 No pending products at the moment.</p>
+        </ng-template>
+      </div>
+      
+  </div>
+  

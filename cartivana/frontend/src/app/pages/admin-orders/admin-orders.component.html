@@ -1,0 +1,54 @@
+<div class="container mt-4">
+    <h4>📦 All Orders</h4>
+  
+    <!-- Filters -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <input type="email" class="form-control" [(ngModel)]="filters.email" placeholder="Customer Email">
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" [(ngModel)]="filters.status">
+          <option value="">All Statuses</option>
+          <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="date" class="form-control" [(ngModel)]="filters.startDate">
+      </div>
+      <div class="col-md-2">
+        <input type="date" class="form-control" [(ngModel)]="filters.endDate">
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" (click)="fetchOrders()">Apply Filters</button>
+      </div>
+    </div>
+  
+    <!-- Orders Table -->
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>
+            <a href="javascript:void(0)" (click)="goToOrderDetails(order._id)">
+              {{ order._id }}
+            </a>
+          </td>
+          <td>{{ order.user?.name }}<br><small>{{ order.user?.email }}</small></td>
+          <td><span class="badge bg-secondary">{{ order.status }}</span></td>
+          <td>{{ order.createdAt | date:'shortDate' }}</td>
+          <td>₹{{ order.totalAmount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <p *ngIf="orders.length === 0" class="text-muted">No orders found for selected filters.</p>
+  </div>
+  

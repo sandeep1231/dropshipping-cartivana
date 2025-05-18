@@ -1,0 +1,69 @@
+<div class="container mt-4">
+    <h3 class="mb-4">📊 Admin Overview</h3>
+  
+    <div *ngIf="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  
+    <div *ngIf="!loading">
+      <!-- Stat Cards -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-success">
+            <div class="card-body">
+              <h6 class="text-muted">Total Users</h6>
+              <h3 class="fw-bold">{{ totalUsers }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-primary">
+            <div class="card-body">
+              <h6 class="text-muted">Total Products</h6>
+              <h3 class="fw-bold">{{ totalProducts }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center shadow-sm border-warning">
+            <div class="card-body">
+              <h6 class="text-muted">Total Orders</h6>
+              <h3 class="fw-bold">{{ totalOrders }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Charts -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">User Role Distribution</div>
+            <div class="card-body">
+              <canvas baseChart
+                [data]="pieChartData"
+                [type]="'pie'"
+                [options]="pieChartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+  
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">Monthly Orders</div>
+            <div class="card-body">
+              <canvas baseChart
+                [data]="barChartData"
+                [type]="'bar'"
+                [options]="barChartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

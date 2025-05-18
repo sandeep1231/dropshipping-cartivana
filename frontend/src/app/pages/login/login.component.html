@@ -1,0 +1,21 @@
+<div class="container mt-5" style="max-width: 500px;">
+    <h2 class="text-center mb-4">🔐 Login</h2>
+  
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="form.email" name="email" class="form-control" required>
+      </div>
+  
+      <div class="mb-3">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="form.password" name="password" class="form-control" required>
+      </div>
+  
+      <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+  
+      <button class="btn btn-primary w-100">Login</button>
+      <p class="text-center mt-3">New here? <a routerLink="/register">Register</a></p>
+    </form>
+  </div>
+  

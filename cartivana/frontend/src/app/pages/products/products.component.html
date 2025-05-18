@@ -1,0 +1,40 @@
+<div class="container mt-4">
+    <h2 class="section-title">🛍️ Our Products</h2>
+  
+    <!-- Filter Buttons -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+      <button
+        *ngFor="let cat of categories"
+        (click)="filterByCategory(cat)"
+        class="btn"
+        [ngClass]="{'btn-primary': selectedCategory === cat, 'btn-outline-primary': selectedCategory !== cat}">
+        {{ cat }}
+      </button>
+    </div>
+  
+    <!-- Product Grid -->
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3" *ngFor="let product of filteredProducts">
+        <div class="card product-card shadow-sm border-0 h-100">
+          <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}">
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text text-muted">₹{{ product.price }}</p>
+            <div class="d-flex align-items-center mb-2">
+                <label class="me-2 mb-0">Qty:</label>
+                <input type="number" class="form-control form-control-sm w-50"
+                       [(ngModel)]="quantities[product._id]" min="1" />
+              </div>
+            <button class="btn btn-dark mt-3" (click)="addToCart(product._id, quantities[product._id] || 1)">Add to Cart</button>
+            <a [routerLink]="['/product', product._id]" class="btn btn-outline-dark btn-sm mt-2">View</a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div *ngIf="filteredProducts.length === 0" class="text-center text-muted mt-5">
+      <p>No products found in this category.</p>
+    </div>
+  </div>
+  

@@ -1,0 +1,61 @@
+<div class="container mt-4" *ngIf="!loading && order">
+    <h4>📦 Order Details</h4>
+  
+    <!-- Order Meta -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <p><strong>Order ID:</strong> {{ order._id }}</p>
+        <p><strong>Status:</strong>
+          <select [(ngModel)]="order.status" (change)="updateStatus(order.status)" class="form-select form-select-sm w-auto d-inline-block ms-2">
+            <option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</option>
+          </select>
+        </p>
+        <p><strong>Date:</strong> {{ order.createdAt | date:'short' }}</p>
+        <p><strong>Total:</strong> ₹{{ order.totalAmount }}</p>
+      </div>
+    </div>
+  
+    <!-- Customer -->
+    <div class="card mb-4">
+      <div class="card-header">👤 Customer Info</div>
+      <div class="card-body">
+        <p><strong>Name:</strong> {{ order.user?.name }}</p>
+        <p><strong>Email:</strong> {{ order.user?.email }}</p>
+      </div>
+    </div>
+  
+    <!-- Products -->
+    <div class="card mb-4">
+      <div class="card-header">📦 Products</div>
+      <div class="card-body table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>Supplier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of order.products">
+              <td>{{ item.product?.name }}</td>
+              <td>₹{{ item.product?.price }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>
+                {{ item.supplier?.name }}<br>
+                <small>{{ item.supplier?.email }}</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="text-center my-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+  

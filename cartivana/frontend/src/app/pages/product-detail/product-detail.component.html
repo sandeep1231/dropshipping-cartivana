@@ -1,0 +1,39 @@
+<!-- <div *ngIf="!product">
+    <div class="container text-center mt-5">
+      <h3>Product not found 🫣</h3>
+      <a routerLink="/products" class="btn btn-outline-primary mt-3">Back to Products</a>
+    </div>
+  </div> -->
+  
+<div *ngIf="product" class="container mt-5">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <img [src]="product!.imageUrl" class="img-fluid rounded shadow" alt="{{ product!.name }}">
+      </div>
+      <div class="col-md-6">
+        <h2 class="fw-bold">{{ product!.name }}</h2>
+        <p class="text-muted">Category: {{ product!.category }}</p>
+        <h4 class="text-primary mb-3">₹{{ product!.price }}</h4>
+  
+        <p>{{ product!.description }}</p>
+        <p class="text-muted small">{{ product!.details }}</p>
+        <div class="mb-3">
+            <label>Quantity:</label>
+            <input type="number" [(ngModel)]="quantity" class="form-control w-25" min="1" />
+          </div>
+        <button class="btn btn-dark mt-3" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
+
+      </div>
+    </div>
+  
+    <hr class="my-5">
+  
+    <div class="row mt-4">
+      <div class="col">
+        <h5 class="text-secondary">🔒 Secure Checkout</h5>
+        <h5 class="text-secondary">🚚 Free Shipping</h5>
+        <h5 class="text-secondary">🔁 Easy Returns</h5>
+      </div>
+    </div>
+  </div>
+  

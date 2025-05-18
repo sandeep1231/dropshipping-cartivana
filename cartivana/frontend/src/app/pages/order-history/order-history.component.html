@@ -1,0 +1,28 @@
+<div class="container mt-5">
+    <h2 class="section-title">📜 Order History</h2>
+  
+    <div *ngIf="orders.length; else noOrders">
+      <div class="card mb-4" *ngFor="let order of orders">
+        <div class="card-body">
+          <h5 class="card-title">Order ID: {{ order._id }}</h5>
+          <p>Status: <strong>{{ order.status }}</strong></p>
+          <p>Date: {{ order.createdAt | date }}</p>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between" *ngFor="let item of order.products">
+              <span>{{ item.product.name }} x {{ item.quantity }}</span>
+              <span>₹{{ item.product.price * item.quantity }}</span>
+            </li>
+          </ul>
+          <p class="mt-3 text-end fw-bold">Total: ₹{{ order.totalAmount }}</p>
+        </div>
+      </div>
+    </div>
+  
+    <ng-template #noOrders>
+      <div class="text-center text-muted mt-4">
+        <p>You haven’t placed any orders yet.</p>
+        <a routerLink="/products" class="btn btn-outline-primary">Shop Now</a>
+      </div>
+    </ng-template>
+  </div>
+  

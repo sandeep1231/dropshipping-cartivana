@@ -1,0 +1,33 @@
+/* You can add global styles to this file, and also import other style files */
+// @import "node_modules/bootstrap/scss/bootstrap";
+
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  color: #212529;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.container {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #343a40;
+  border-bottom: 2px solid #e9ecef;
+  display: inline-block;
+}

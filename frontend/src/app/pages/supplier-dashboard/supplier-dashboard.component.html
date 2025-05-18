@@ -1,0 +1,150 @@
+<div class="container mt-5">
+    <h2 class="mb-4">📦 Supplier Dashboard</h2>
+  
+    <div class="row g-4">
+        <div class="col-md-3" *ngFor="let stat of statsCards">
+          <div class="card text-center shadow-sm border-info">
+            <div class="card-body">
+              <h6 class="card-title text-muted">{{ stat.label }}</h6>
+              <h3 class="card-text fw-bold">{{ stat.value }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Charts -->
+      <div class="row mt-5 g-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">Product Status Distribution</div>
+            <div class="card-body">
+              <canvas baseChart
+                [data]="pieChartData"
+                [type]="pieChartType"
+                [options]="pieChartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+    
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">Monthly Orders</div>
+            <div class="card-body">
+              <canvas baseChart
+                [data]="barChartData"
+                [type]="barChartType"
+                [options]="barChartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">My Products</h5>
+      <button class="btn btn-primary btn-sm" (click)="showAddProductForm = true">+ Add Product</button>
+    </div>
+  
+    <div *ngIf="showAddProductForm" class="card p-3 mb-4">
+      <h6>Add New Product</h6>
+      <form (ngSubmit)="addProduct()">
+        <input [(ngModel)]="newProduct.name" name="name" class="form-control mb-2" placeholder="Name" required>
+        <input type="file" (change)="uploadFile($event)" class="form-control mb-2" />
+
+        <textarea [(ngModel)]="newProduct.description" name="description" class="form-control mb-2" placeholder="Description"></textarea>
+        <input [(ngModel)]="newProduct.price" name="price" class="form-control mb-2" type="number" placeholder="Price">
+        <input [(ngModel)]="newProduct.category" name="category" class="form-control mb-2" placeholder="Category">
+        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="showAddProductForm = false">Cancel</button>
+      </form>
+    </div>
+  
+    <div *ngIf="editingProduct" class="card p-3 mb-4 border border-info">
+        <h6>Edit Product</h6>
+        <form (ngSubmit)="updateProduct()">
+          <input [(ngModel)]="editingProduct.name" name="name" class="form-control mb-2" placeholder="Name" required>
+          <input type="file" (change)="uploadFile($event)" class="form-control mb-2" />
+
+          <textarea [(ngModel)]="editingProduct.description" name="description" class="form-control mb-2" placeholder="Description"></textarea>
+          <input [(ngModel)]="editingProduct.price" name="price" class="form-control mb-2" type="number" placeholder="Price">
+          <input [(ngModel)]="editingProduct.category" name="category" class="form-control mb-2" placeholder="Category">
+          <button type="submit" class="btn btn-success btn-sm">Update</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="editingProduct = null">Cancel</button>
+        </form>
+      </div>
+      <input type="text" [(ngModel)]="searchText" placeholder="Search..." class="form-control mb-3">
+
+        <div *ngFor="let product of filteredProducts">
+        <!-- Product Card -->
+        <div class="d-flex justify-content-between">
+            <div>
+              <h6>{{ product.name }}</h6>
+              <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+            </div>
+            <span class="badge bg-secondary" *ngIf="product.status === 'pending'">Pending</span>
+              <span class="badge bg-success" *ngIf="product.status === 'approved'">Approved</span>
+              <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>
+  
+            <div>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="editProduct(product)">Edit</button>
+  
+            </div>
+          </div>
+        </div>
+
+        <nav *ngIf="totalPages() > 1">
+        <ul class="pagination">
+            <li class="page-item" *ngFor="let i of [].constructor(totalPages()); let idx = index">
+            <button class="page-link" (click)="currentPage = idx + 1">{{ idx + 1 }}</button>
+            </li>
+        </ul>
+        </nav>
+
+    <!-- <div *ngIf="myProducts.length; else noProducts">
+      <div class="card mb-3 p-3" *ngFor="let product of myProducts">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h6>{{ product.name }}</h6>
+            <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+          </div>
+          <span class="badge bg-secondary" *ngIf="product.status === 'pending'">Pending</span>
+            <span class="badge bg-success" *ngIf="product.status === 'approved'">Approved</span>
+            <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>
+
+          <div>
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="editProduct(product)">Edit</button>
+
+          </div>
+        </div>
+      </div>
+    </div> -->
+  
+    <div *ngIf="rejectedProducts.length">Rejected Products:
+        <div class="card mb-3 p-3" *ngFor="let product of rejectedProducts">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6>{{ product.name }}</h6>
+              <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+            </div>
+            
+              <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>
+              <div *ngIf="product.status === 'rejected'" class="text-danger mt-1">
+                Reason: {{ product.rejectionReason }}
+              </div>
+              
+            <div>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="editProduct(product)">Edit</button>
+  
+            </div>
+          </div>
+        </div>
+      </div>
+    <ng-template #noProducts>
+      <p class="text-muted">You haven’t added any products yet.</p>
+    </ng-template>
+  </div>
+  

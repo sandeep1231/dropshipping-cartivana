@@ -1,0 +1,40 @@
+<div class="container mt-4">
+    <h4>👥 Manage Users</h4>
+  
+    <div class="mb-3">
+      <select [(ngModel)]="filter" class="form-select w-auto">
+        <option value="">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="supplier">Supplier</option>
+        <option value="customer">Customer</option>
+      </select>
+    </div>
+  
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Change Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers()">
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td><span class="badge bg-secondary">{{ user.role }}</span></td>
+          <td>
+            <select class="form-select form-select-sm"
+        [value]="user.role"
+        (change)="onRoleChange($event, user)">
+  <option value="admin">Admin</option>
+  <option value="supplier">Supplier</option>
+  <option value="customer">Customer</option>
+</select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
