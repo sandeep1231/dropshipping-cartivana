@@ -1,0 +1,97 @@
+/* Custom styles for the login page */
+.login-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin: 0 auto;
+  max-width: 400px;
+}
+.login-icon {
+  font-size: 2.5rem;
+  color: #0d6efd;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+.login-title {
+  font-weight: 600;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.input-group-text {
+  background: #f1f3f4;
+  border: none;
+  min-width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
+  border-color: #0d6efd;
+}
+.input-group {
+  width: 100%;
+}
+.input-group .form-control {
+  min-width: 0;
+}
+.input-group-text, .show-password-toggle {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.show-password-toggle {
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  font-size: 1.2rem;
+  transition: background 0.2s;
+  min-width: 2.5rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  height: 100%;
+  &:hover, &:focus {
+    background: #f1f3f4;
+  }
+}
+// Force input group to fill width and inputs to match
+.login-card .input-group {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.login-card .input-group .form-control {
+  flex: 1 1 0%;
+  width: 1%;
+  min-width: 0;
+}
+
+.login-card .input-group-text,
+.login-card .show-password-toggle {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+@media (max-width: 576px) {
+  .login-card {
+    padding: 1.5rem 0.5rem;
+  }
+}

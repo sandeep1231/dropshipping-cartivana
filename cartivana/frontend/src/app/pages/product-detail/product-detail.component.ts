@@ -45,9 +45,14 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
-    this.productService.getProductById(id).subscribe((data: Product) => this.product = data);
-    // this.product = this.mockProducts.find(p => p.id === id);
-    this.cd.detectChanges();
+    this.productService.getProductById(id).subscribe((data: Product) => {
+      // Add dummy description for demo
+      this.product = {
+        ...data,
+        description: data.description || 'This is a beautiful handcrafted product from Odisha, made with care and tradition. Perfect for your home or as a unique gift. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, nisi eu consectetur.'
+      };
+      this.cd.detectChanges();
+    });
   }
   addToCart(productId: string , quantity: number): void {
     this.cartService.addToCart(productId, quantity).subscribe(() => {

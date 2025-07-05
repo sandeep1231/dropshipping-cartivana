@@ -1,21 +1,40 @@
-<div class="container mt-5" style="max-width: 500px;">
-    <h2 class="text-center mb-4">🔐 Login</h2>
-  
-    <form (ngSubmit)="onSubmit()">
+<div class="d-flex align-items-center justify-content-center min-vh-100">
+  <div class="login-card w-100">
+    <div class="login-icon mb-2">
+      <span style="font-size:2.5rem;color:#0d6efd;">🔒</span>
+    </div>
+    <div class="login-title mb-4">Login</div>
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="off" novalidate>
       <div class="mb-3">
-        <label>Email</label>
-        <input type="email" [(ngModel)]="form.email" name="email" class="form-control" required>
+        <label for="email" class="form-label">Email</label>
+        <div class="input-group">
+          <span class="input-group-text">&#64;</span>
+          <input type="email" [(ngModel)]="form.email" name="email" id="email" class="form-control" required email #emailRef="ngModel" autocomplete="username">
+        </div>
+        <div *ngIf="(emailRef.touched || emailRef.dirty) && emailRef.invalid" class="form-text text-danger ms-1">
+          <span *ngIf="emailRef.errors?.['required']">Email is required.</span>
+          <span *ngIf="emailRef.errors?.['email']">Please enter a valid email address.</span>
+        </div>
       </div>
-  
       <div class="mb-3">
-        <label>Password</label>
-        <input type="password" [(ngModel)]="form.password" name="password" class="form-control" required>
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group w-100">
+          <span class="input-group-text">*</span>
+          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="form.password" name="password" id="password" class="form-control" required #passwordRef="ngModel" autocomplete="current-password">
+          <span class="input-group-text" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" style="cursor:pointer;">
+            <span *ngIf="showPassword">🙈</span><span *ngIf="!showPassword">👁️</span>
+          </span>
+        </div>
+        <div *ngIf="(passwordRef.touched || passwordRef.dirty) && passwordRef.invalid" class="form-text text-danger ms-1">
+          <span *ngIf="passwordRef.errors?.['required']">Password is required.</span>
+        </div>
       </div>
-  
       <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
-  
-      <button class="btn btn-primary w-100">Login</button>
-      <p class="text-center mt-3">New here? <a routerLink="/register">Register</a></p>
+      <button class="btn btn-primary w-100 mt-2" [disabled]="loading || loginForm.invalid">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Login
+      </button>
+      <p class="text-center mt-3 mb-0">New here? <a routerLink="/register">Register</a></p>
     </form>
   </div>
-  
+</div>

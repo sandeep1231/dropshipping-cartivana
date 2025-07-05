@@ -17,17 +17,23 @@ export class LoginComponent {
   };
 
   errorMsg = '';
+  showPassword = false;
+  loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
+    this.loading = true;
+    this.errorMsg = '';
     this.authService.login(this.form.email, this.form.password).subscribe({
       next: (res: User) => {
         this.authService.setUser(res);
         this.router.navigate(['/']);
+        this.loading = false;
       },
       error: () => {
         this.errorMsg = 'Invalid email or password';
+        this.loading = false;
       }
     });
   }

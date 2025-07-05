@@ -1,0 +1,82 @@
+// Global button styles for uniformity across the app
+.btn, .btn:focus, .btn:active {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.04);
+  outline: none;
+}
+
+.btn-primary, .btn-primary:focus, .btn-primary:active {
+  background: linear-gradient(90deg, #0d6efd 60%, #0a58ca 100%);
+  color: #fff;
+  border: none;
+}
+
+.btn-outline-primary, .btn-outline-primary:focus, .btn-outline-primary:active {
+  color: #0d6efd;
+  border: 2px solid #0d6efd;
+  background: #fff;
+}
+
+.btn-outline-primary:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.btn-success, .btn-success:focus, .btn-success:active {
+  background: linear-gradient(90deg, #198754 60%, #157347 100%);
+  color: #fff;
+  border: none;
+}
+
+.btn-outline-success, .btn-outline-success:focus, .btn-outline-success:active {
+  color: #198754;
+  border: 2px solid #198754;
+  background: #fff;
+}
+
+.btn-outline-success:hover {
+  background: #198754;
+  color: #fff;
+}
+
+.btn-dark, .btn-dark:focus, .btn-dark:active {
+  background: #212529;
+  color: #fff;
+  border: none;
+}
+
+.btn-outline-dark, .btn-outline-dark:focus, .btn-outline-dark:active {
+  color: #212529;
+  border: 2px solid #212529;
+  background: #fff;
+}
+
+.btn-outline-dark:hover {
+  background: #212529;
+  color: #fff;
+}
+
+.btn-light, .btn-light:focus, .btn-light:active {
+  background: #f8f9fa;
+  color: #343a40;
+  border: 1.5px solid #dee2e6;
+}
+
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-lg {
+  font-size: 1.15rem;
+  padding: 0.75rem 2.25rem;
+}
+
+.btn-sm {
+  font-size: 0.95rem;
+  padding: 0.35rem 1.1rem;
+}

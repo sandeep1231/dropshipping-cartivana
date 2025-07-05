@@ -1,10 +1,79 @@
-img {
-    max-height: 400px;
-    object-fit: cover;
+// Product Details Tabs
+.product-tabs {
+  .nav-link {
+    font-weight: 600;
+    color: #343a40;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    background: none;
+    transition: color 0.2s, border-color 0.2s;
+    &.active {
+      color: #0d6efd;
+      border-bottom: 2.5px solid #0d6efd;
+      background: none;
+    }
+    &:hover {
+      color: #0a58ca;
+    }
   }
-  
-  button {
-    border-radius: 30px;
-    padding: 0.6rem 2rem;
+}
+
+.tab-content {
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  min-height: 120px;
+}
+
+.product-detail-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+}
+
+.product-image-wrapper {
+  background: #f7f7f7;
+  border-radius: 16px;
+  padding: 2rem;
+  min-width: 320px;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-wrapper img {
+  max-height: 260px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.trust-badges {
+  font-size: 1.1rem;
+  gap: 2.5rem;
+}
+
+.trust-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .product-detail-container {
+    padding: 1.2rem 0.5rem;
   }
+  .product-image-wrapper {
+    min-width: 180px;
+    min-height: 180px;
+    padding: 1rem;
+  }
+  .trust-badges {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+}
   

@@ -5,35 +5,78 @@
     </div>
   </div> -->
   
-<div *ngIf="product" class="container mt-5">
-    <div class="row align-items-center">
-      <div class="col-md-6">
-        <img [src]="product!.imageUrl" class="img-fluid rounded shadow" alt="{{ product!.name }}">
-      </div>
-      <div class="col-md-6">
-        <h2 class="fw-bold">{{ product!.name }}</h2>
-        <p class="text-muted">Category: {{ product!.category }}</p>
-        <h4 class="text-primary mb-3">₹{{ product!.price }}</h4>
-  
-        <p>{{ product!.description }}</p>
-        <p class="text-muted small">{{ product!.details }}</p>
-        <div class="mb-3">
-            <label>Quantity:</label>
-            <input type="number" [(ngModel)]="quantity" class="form-control w-25" min="1" />
-          </div>
-        <button class="btn btn-dark mt-3" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
 
+<div *ngIf="product" class="container product-detail-container mt-5 mb-5">
+  <div class="row align-items-center justify-content-center">
+    <div class="col-12 col-md-5 d-flex justify-content-center mb-4 mb-md-0">
+      <div class="product-image-wrapper shadow-lg">
+        <img [src]="product!.imageUrl || '/assets/images/placeholder.png'" class="img-fluid" alt="{{ product!.name }}">
       </div>
     </div>
-  
-    <hr class="my-5">
-  
-    <div class="row mt-4">
-      <div class="col">
-        <h5 class="text-secondary">🔒 Secure Checkout</h5>
-        <h5 class="text-secondary">🚚 Free Shipping</h5>
-        <h5 class="text-secondary">🔁 Easy Returns</h5>
+    <div class="col-12 col-md-6">
+      <h2 class="fw-bold mb-2">{{ product!.name }}</h2>
+      <div class="mb-2">
+        <span class="badge bg-primary bg-gradient me-2">{{ product!.category }}</span>
+      </div>
+      <h3 class="text-primary mb-3">9{{ product!.price | currency:'INR' }}</h3>
+      <p class="mb-2">{{ product!.description }}</p>
+      <p class="text-muted small mb-3">{{ product!.details }}</p>
+      <div class="d-flex align-items-center mb-3">
+        <label class="me-2 mb-0">Quantity:</label>
+        <input type="number" [(ngModel)]="quantity" class="form-control form-control-sm w-25" min="1" />
+      </div>
+      <button class="btn btn-primary btn-lg px-5 py-2 mt-2" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
+    </div>
+  </div>
+
+
+  <!-- Product Details Tabs -->
+  <div class="container mt-4 mb-5">
+    <ul class="nav nav-tabs product-tabs mb-3" id="productTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab" aria-controls="desc" aria-selected="true">Description</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab" aria-controls="specs" aria-selected="false">Specifications</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
+      </li>
+    </ul>
+    <div class="tab-content p-4 bg-white rounded shadow-sm" id="productTabContent">
+      <div class="tab-pane fade show active" id="desc" role="tabpanel" aria-labelledby="desc-tab">
+        <h5 class="fw-bold mb-2">Product Description</h5>
+        <p>{{ product!.description || 'No description available.' }}</p>
+      </div>
+      <div class="tab-pane fade" id="specs" role="tabpanel" aria-labelledby="specs-tab">
+        <h5 class="fw-bold mb-2">Specifications</h5>
+        <ul *ngIf="product!.specs && product!.specs.length; else noSpecs">
+          <li *ngFor="let spec of product!.specs">{{ spec }}</li>
+        </ul>
+        <ng-template #noSpecs><p>No specifications available.</p></ng-template>
+      </div>
+      <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+        <h5 class="fw-bold mb-2">Customer Reviews</h5>
+        <p class="text-muted">Reviews coming soon.</p>
       </div>
     </div>
   </div>
+
+  <div class="row mt-4 justify-content-center">
+    <div class="col-12 col-md-8 d-flex justify-content-around trust-badges">
+      <div class="d-flex align-items-center gap-2">
+        <span class="trust-icon"><i class="bi bi-shield-lock-fill text-primary"></i></span>
+        <span>Secure Checkout</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="trust-icon"><i class="bi bi-truck text-success"></i></span>
+        <span>Free Shipping</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="trust-icon"><i class="bi bi-arrow-repeat text-info"></i></span>
+        <span>Easy Returns</span>
+      </div>
+    </div>
+  </div>
+</div>
   

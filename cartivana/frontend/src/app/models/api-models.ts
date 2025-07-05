@@ -16,7 +16,8 @@ export interface User {
     imageUrl?: string;
     category: string;
     supplier?: User;
-    details?:string;
+    details?: string;
+    specs?: string[]; // Array of product specifications
   }
   
 export interface OrderItem {
