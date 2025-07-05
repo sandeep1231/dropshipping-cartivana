@@ -137,14 +137,15 @@ totalPages(): number {
   return Math.ceil(this.myProducts.length / this.itemsPerPage);
 }
 
-uploadFile(event: any) {
-    const file = event.target.files[0];
-    const formData = new FormData();
-    formData.append('image', file);
-  
-    this.http.post<any>('http://localhost:5000/api/upload', formData).subscribe(res => {
-      this.newProduct.imageUrl = res.imageUrl;
-    });
-  }
+uploadFile(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('image', file);
+  this.http.post<{ imageUrl: string }>('http://localhost:5000/api/upload', formData).subscribe(res => {
+    this.newProduct.imageUrl = res.imageUrl;
+  });
+}
   
 }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
 import { Cart } from '../../models/cart.model';
+import { Order } from '../../models/api-models';
 // import { OrderService } from 'src/app/services/order.service';
 
 @Component({
@@ -43,22 +44,25 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
+    if (!this.cartItems) return;
+    const products = this.cartItems.items.map((item) => ({
+      product: item.product._id,
+      quantity: item.quantity
+    }));
+    const totalAmount = this.cartItems.items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
     const orderPayload = {
-      products: this.cartItems?.items.map((item: { _id: any; quantity: any; }) => ({
-        product: item._id,
-        quantity: item.quantity
-      }))
+      products,
+      totalAmount
     };
 
     this.orderService.placeOrder(orderPayload).subscribe({
-      next: (res) => {
+      next: (res: Order) => {
         alert('✅ Order placed successfully!');
         this.cartService.clearCart();
         this.router.navigate(['/']);
       },
-      error: (err) => {
+      error: () => {
         alert('❌ Failed to place order.');
-        console.error(err);
       }
     });
   }

@@ -59,6 +59,11 @@ const createProduct = async (req, res) => {
   
   
 
+/**
+ * Delete a product by ID. Only the owner or an admin can delete.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -76,27 +81,37 @@ const deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Delete failed.' });
   }
 };
+/**
+ * Get all pending products.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const getPendingProducts = async (req, res) => {
-    try {
-      const pending = await Product.find({ status: 'pending' }).populate('supplier', 'name email');
-      res.json(pending);
-    } catch (err) {
-      res.status(500).json({ message: 'Failed to fetch pending products.' });
-    }
-  };
+  try {
+    const pending = await Product.find({ status: 'pending' }).populate('supplier', 'name email');
+    res.json(pending);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch pending products.' });
+  }
+};
   
-  const approveProduct = async (req, res) => {
-    try {
-      const product = await Product.findById(req.params.id);
-      if (!product) return res.status(404).json({ message: 'Product not found' });
-  
-      product.status = 'approved';
-      const updated = await product.save();
-      res.json(updated);
-    } catch (err) {
-      res.status(500).json({ message: 'Approval failed.' });
-    }
-  };
+/**
+ * Approve a product by ID.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+const approveProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    product.status = 'approved';
+    const updated = await product.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: 'Approval failed.' });
+  }
+};
   
   const rejectProduct = async (req, res) => {
     try {

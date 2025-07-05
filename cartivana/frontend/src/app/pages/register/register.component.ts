@@ -24,8 +24,8 @@ export class RegisterComponent {
 
   onSubmit() {
     this.authService.register(this.form).subscribe({
-      next: (res) => {
-        this.authService.setUser(res as User);
+      next: (res: User) => {
+        this.authService.setUser(res);
         this.router.navigate(['/']);
       },
       error: () => {

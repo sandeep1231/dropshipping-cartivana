@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
-// import { OrderService } from 'src/app/services/order.service';
+import { Order } from '../../models/api-models';
 
 @Component({
   selector: 'app-my-order-details-user',
@@ -9,7 +9,7 @@ import { OrderService } from '../../services/order.service';
   standalone: false
 })
 export class MyOrderDetailsUserComponent implements OnInit {
-  order: any;
+  order: Order | null = null;
   loading = true;
 
   constructor(private route: ActivatedRoute, private orderService: OrderService) {}
@@ -17,7 +17,7 @@ export class MyOrderDetailsUserComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.orderService.getOrderByIdForUser(id).subscribe(res => {
+      this.orderService.getOrderByIdForUser(id).subscribe((res: Order) => {
         this.order = res;
         this.loading = false;
       });

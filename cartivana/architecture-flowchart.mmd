@@ -1,0 +1,58 @@
+flowchart TD
+    Start([Start])
+    Stop([Stop])
+
+    %% User Flow
+    Start --> UserBox[User]
+    UserBox --> UserLogin{Login?}
+    UserLogin -- No --> UserRegister[Register]
+    UserRegister --> UserLogin
+    UserLogin -- Yes --> UserDashboard[User Dashboard]
+    UserDashboard --> SearchProduct[Search Products]
+    SearchProduct --> ViewProduct[View Product Details]
+    ViewProduct --> AddToCart[Add to Cart]
+    AddToCart --> GoToCart[Go to Cart]
+    GoToCart --> Checkout[Checkout]
+    Checkout --> Payment{Payment?}
+    Payment -- No --> GoToCart
+    Payment -- Yes --> PaymentType{Payment Type}
+    PaymentType -- "Cash on Delivery" --> PlaceOrder[Place Order]
+    PaymentType -- "Online Pay (coming soon)" --> PlaceOrder
+    PlaceOrder --> MyOrders[View My Orders]
+    MyOrders --> UserLogout[Logout]
+    UserLogout --> Stop
+
+    %% Admin Flow
+    Start --> AdminBox[Admin]
+    AdminBox --> AdminLogin{Login?}
+    AdminLogin -- No --> AdminLogin
+    AdminLogin -- Yes --> AdminDashboard[Admin Dashboard]
+    AdminDashboard --> ManageUsers[Manage Users]
+    AdminDashboard --> ManageProducts[View All Products]
+    AdminDashboard --> ApproveProducts[Approve/Reject Products]
+    AdminDashboard --> ManageOrders[Manage Orders]
+    AdminDashboard --> ViewReports[View Reports]
+    AdminDashboard --> AdminLogout[Logout]
+    AdminLogout --> Stop
+
+    %% Supplier Flow
+    Start --> SupplierBox[Supplier]
+    SupplierBox --> SupplierLogin{Login?}
+    SupplierLogin -- No --> SupplierLogin
+    SupplierLogin -- Yes --> SupplierDashboard[Supplier Dashboard]
+    SupplierDashboard --> ViewProductStats[View Product Stats]
+    SupplierDashboard --> ViewOrderStats[View Order Stats]
+    SupplierDashboard --> ListMyProducts[View My Products]
+    ListMyProducts --> AddProduct[Add New Product]
+    ListMyProducts --> EditProduct[Edit Product]
+    ListMyProducts --> DeleteProduct[Delete Product]
+    ListMyProducts --> ViewRejected[View Rejected Products]
+    SupplierDashboard --> ViewOrders[View Orders for My Products]
+    SupplierDashboard --> SupplierLogout[Logout]
+    SupplierLogout --> Stop
+
+    %% Styling for clarity
+    classDef decision fill:#f9f,stroke:#333,stroke-width:2px;
+    class UserLogin,Payment,AdminLogin,PaymentType,SupplierLogin decision;
+    classDef process fill:#bbf,stroke:#333,stroke-width:1px;
+    class UserBox,UserRegister,UserDashboard,SearchProduct,ViewProduct,AddToCart,GoToCart,Checkout,PlaceOrder,MyOrders,UserLogout,AdminBox,AdminDashboard,ManageUsers,ManageProducts,ApproveProducts,ManageOrders,ViewReports,AdminLogout,SupplierBox,SupplierDashboard,ViewProductStats,ViewOrderStats,ListMyProducts,AddProduct,EditProduct,DeleteProduct,ViewRejected,ViewOrders,SupplierLogout process;

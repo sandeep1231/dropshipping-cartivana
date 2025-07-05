@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 // import { OrderService } from 'src/app/services/order.service';
 import { Router } from '@angular/router';
 import { OrderService } from '../../services/order.service';
+import { Order } from '../../models/api-models';
 
 @Component({
   selector: 'app-my-orders-user',
@@ -9,12 +10,12 @@ import { OrderService } from '../../services/order.service';
   standalone: false
 })
 export class MyOrdersUserComponent implements OnInit {
-  orders: any[] = [];
+  orders: Order[] = [];
 
   constructor(private orderService: OrderService, private router: Router) {}
 
   ngOnInit(): void {
-    this.orderService.getMyOrdersForUser().subscribe(res => {
+    this.orderService.getMyOrdersForUser().subscribe((res: Order[]) => {
       this.orders = res;
     });
   }

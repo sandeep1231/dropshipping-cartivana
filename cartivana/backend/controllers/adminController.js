@@ -59,42 +59,52 @@ const getAdminStats = async (req, res) => {
       res.status(500).json({ message: 'Failed to fetch admin stats' });
     }
   };
+  /**
+   * Get all orders with optional filters (email, status, date range).
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   */
   const getAllOrders = async (req, res) => {
     try {
       const { email, status, startDate, endDate } = req.query;
       const filter = {};
-  
+
       if (email) {
         const user = await User.findOne({ email });
         if (user) filter.user = user._id;
         else return res.json([]); // no match
       }
-  
+
       if (status) filter.status = status;
       if (startDate || endDate) {
         filter.createdAt = {};
         if (startDate) filter.createdAt.$gte = new Date(startDate);
         if (endDate) filter.createdAt.$lte = new Date(endDate);
       }
-  
+
       const orders = await Order.find(filter)
         .populate('user', 'name email')
         .populate('products.product', 'name price');
-  
+
       res.json(orders);
     } catch (err) {
       res.status(500).json({ message: 'Failed to fetch orders' });
     }
   };
+  /**
+   * Get an order by ID.
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   */
   const getOrderById = async (req, res) => {
     try {
       const order = await Order.findById(req.params.id)
         .populate('user', 'name email')
         .populate('products.product', 'name price')
         .populate('products.supplier', 'name email');
-  
+
       if (!order) return res.status(404).json({ message: 'Order not found' });
-  
+
       res.json(order);
     } catch {
       res.status(500).json({ message: 'Failed to fetch order' });

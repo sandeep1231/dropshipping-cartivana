@@ -10,8 +10,8 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  placeOrder(orderData: any) {
-    return this.http.post(this.API_URL, orderData);
+  placeOrder(orderData: { products: { product: string; quantity: number }[]; totalAmount: number }) {
+    return this.http.post<Order>(this.API_URL, orderData);
   }
 
   getMyOrders(): Observable<Order[]> {

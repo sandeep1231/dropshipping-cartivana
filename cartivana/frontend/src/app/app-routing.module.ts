@@ -65,7 +65,7 @@ const routes: Routes = [
         path: 'my-orders/:id',
         component: MyOrderDetailsUserComponent,
         canActivate: [AuthGuard]
-      }
+      },
       
       
     { path: '**', component: NotFoundComponent }

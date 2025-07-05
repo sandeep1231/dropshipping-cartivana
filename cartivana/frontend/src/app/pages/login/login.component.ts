@@ -22,8 +22,8 @@ export class LoginComponent {
 
   onSubmit() {
     this.authService.login(this.form.email, this.form.password).subscribe({
-      next: (res) => {
-        this.authService.setUser(res as User);
+      next: (res: User) => {
+        this.authService.setUser(res);
         this.router.navigate(['/']);
       },
       error: () => {

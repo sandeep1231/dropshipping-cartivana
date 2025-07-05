@@ -7,7 +7,7 @@ export interface User {
   }
   
   export interface Product {
-    rejectionReason?: any;
+    rejectionReason?: string; // was any
     status?: string;
     _id: string;
     name: string;
@@ -19,10 +19,13 @@ export interface User {
     details?:string;
   }
   
-  export interface OrderItem {
-    product: Product;
-    quantity: number;
-  }
+export interface OrderItem {
+  product: Product;
+  quantity: number;
+  name?: string;
+  price?: number;
+  supplier?: User;
+}
   
   export interface Order {
     _id: string;
@@ -32,3 +35,16 @@ export interface User {
     createdAt: string;
   }
   
+  export interface RoleCount {
+    _id: string;
+    count: number;
+  }
+  
+  export interface AdminStats {
+    totalUsers: number;
+    totalOrders: number;
+    totalProducts: number;
+    roleCounts: RoleCount[];
+    monthlyOrders: number[];
+    [key: string]: any;
+  }

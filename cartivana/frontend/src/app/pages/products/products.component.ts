@@ -18,7 +18,7 @@ export class ProductsComponent implements OnInit {
   quantities: { [key: string]: number } = {};
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe((data) => {
+    this.productService.getProducts().subscribe((data: Product[]) => {
         this.allProducts = data;
         this.filteredProducts = [...this.allProducts];
   });

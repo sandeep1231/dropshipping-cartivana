@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { User } from '../models/api-models';
+import { User, Order, AdminStats } from '../models/api-models';
+
+export interface OrderQueryParams {
+  status?: string;
+  userId?: string;
+  [key: string]: string | undefined;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -15,18 +21,18 @@ export class AdminService {
       updateUserRole(id: string, role: string): Observable<User> {
         return this.http.patch<User>(`${this.API_URL}/admin/users/${id}/role`, { role });
       }
-      getAdminStats(): Observable<any> {
-        return this.http.get(`${this.API_URL}/admin/stats`);
+      getAdminStats(): Observable<AdminStats> {
+        return this.http.get<AdminStats>(`${this.API_URL}/admin/stats`);
       }
-      getAllOrders(params: any = {}): Observable<any[]> {
-        return this.http.get<any[]>(`${this.API_URL}/admin/orders`, { params });
+      getAllOrders(params: OrderQueryParams = {}): Observable<Order[]> {
+        return this.http.get<Order[]>(`${this.API_URL}/admin/orders`, { params: params as Record<string, string> });
       }
-      getOrderById(id: string): Observable<any> {
-        return this.http.get(`${this.API_URL}/admin/orders/${id}`);
+      getOrderById(id: string): Observable<Order> {
+        return this.http.get<Order>(`${this.API_URL}/admin/orders/${id}`);
       }
       
-      updateOrderStatus(id: string, status: string): Observable<any> {
-        return this.http.patch(`${this.API_URL}/admin/orders/${id}/status`, { status });
+      updateOrderStatus(id: string, status: string): Observable<Order> {
+        return this.http.patch<Order>(`${this.API_URL}/admin/orders/${id}/status`, { status });
       }
             
 }

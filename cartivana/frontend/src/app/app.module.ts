@@ -33,6 +33,7 @@ import { AdminOrdersComponent } from './pages/admin-orders/admin-orders.componen
 import { AuthGuard } from './guards/auth.guard';
 import { MyOrdersUserComponent } from './pages/my-orders-user/my-orders-user.component';
 import { MyOrderDetailsUserComponent } from './pages/my-order-details-user/my-order-details-user.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { MyOrderDetailsUserComponent } from './pages/my-order-details-user/my-or
     AdminOrderDetailsComponent,
     AdminOrdersComponent,
     MyOrdersUserComponent,
-    MyOrderDetailsUserComponent
+    MyOrderDetailsUserComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,6 +71,7 @@ import { MyOrderDetailsUserComponent } from './pages/my-order-details-user/my-or
       { path: 'checkout', component: CheckoutComponent },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
+      { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
       { path: 'supplier', component: SupplierDashboardComponent, canActivate: [RoleGuard], data: { role: 'supplier' } },
       { path: 'admin', component: AdminDashboardComponent, canActivate: [RoleGuard], data: { role: 'admin' } },
       {

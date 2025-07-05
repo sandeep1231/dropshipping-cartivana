@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AdminDashboardOverviewComponent } from './admin-dashboard-overview.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AdminDashboardOverviewComponent', () => {
   let component: AdminDashboardOverviewComponent;
@@ -8,10 +8,10 @@ describe('AdminDashboardOverviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminDashboardOverviewComponent]
+      declarations: [AdminDashboardOverviewComponent],
+      imports: [HttpClientTestingModule]
     })
     .compileComponents();
-    
     fixture = TestBed.createComponent(AdminDashboardOverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { User } from '../models/api-models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -9,10 +10,10 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   getProfile() {
-    return this.http.get(`${this.API_URL}/me`);
+    return this.http.get<User>(`${this.API_URL}/me`);
   }
 
-  updateProfile(data: any) {
-    return this.http.put(`${this.API_URL}/me`, data);
+  updateProfile(data: { name: string; email: string; password?: string }) {
+    return this.http.put<User>(`${this.API_URL}/me`, data);
   }
 }

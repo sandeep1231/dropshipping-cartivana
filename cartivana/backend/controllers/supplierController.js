@@ -1,6 +1,11 @@
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 
+/**
+ * Get product statistics for the current supplier.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const getProductStats = async (req, res) => {
   try {
     const supplierId = req.user._id;
@@ -16,6 +21,11 @@ const getProductStats = async (req, res) => {
   }
 };
 
+/**
+ * Get order statistics for the current supplier.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 const getOrderStats = async (req, res) => {
   try {
     const supplierId = req.user._id;

@@ -1,6 +1,11 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
+/**
+ * Register a new user.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 exports.register = async (req, res) => {
   const { name, email, password, role } = req.body;
   try {
@@ -20,6 +25,11 @@ exports.register = async (req, res) => {
   }
 };
 
+/**
+ * Login a user.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {

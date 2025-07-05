@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+/**
+ * Order schema for MongoDB collection.
+ * @typedef {Object} Order
+ * @property {mongoose.Types.ObjectId} user - Reference to the user
+ * @property {Array<{product: mongoose.Types.ObjectId, name: string, price: number, quantity: number, supplier: mongoose.Types.ObjectId}>} products - Ordered products
+ * @property {number} totalAmount - Total order amount
+ * @property {string} status - Order status ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')
+ * @property {string} confirmationId - Confirmation ID
+ */
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   products: [{

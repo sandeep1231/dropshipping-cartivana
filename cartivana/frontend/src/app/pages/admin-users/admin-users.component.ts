@@ -20,7 +20,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.adminService.getAllUsers().subscribe(res => {
+    this.adminService.getAllUsers().subscribe((res: User[]) => {
       this.users = res;
     });
   }

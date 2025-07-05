@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from 'src/app/services/user.service';
+// import { UserService } from 'src/app/services/user.service';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/api-models';
+// import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  standalone: false,
 })
 export class ProfileComponent implements OnInit {
   form = {
@@ -22,11 +25,10 @@ export class ProfileComponent implements OnInit {
     private auth: AuthService,
     private router: Router
   ) {}
-
   ngOnInit(): void {
-    this.userService.getProfile().subscribe(user => {
-      this.form.name = user['name'];
-      this.form.email = user['email'];
+    this.userService.getProfile().subscribe((user) => {
+      this.form.name = user.name;
+      this.form.email = user.email;
     });
   }
 
