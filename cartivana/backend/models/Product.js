@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   category: String,
   imageUrl: String,
+  sku: { type: String, default: '' },
   featured: { type: Boolean, default: false },
   approved: { type: Boolean, default: false },
   supplier: {

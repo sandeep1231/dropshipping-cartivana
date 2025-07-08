@@ -13,8 +13,13 @@
           <li class="nav-item"><a class="nav-link" routerLink="/products">Products</a></li>
   
           <!-- Cart Link -->
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/cart"><i class="bi bi-cart"></i> Cart</a>
+          <li class="nav-item position-relative">
+            <a class="nav-link" routerLink="/cart">
+              <i class="bi bi-cart"></i> Cart
+              <span *ngIf="cartQuantity > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">
+                {{ cartQuantity }}
+              </span>
+            </a>
           </li>
   
           <!-- If User is Logged In -->

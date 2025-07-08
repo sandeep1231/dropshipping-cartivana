@@ -55,7 +55,10 @@
         <textarea [(ngModel)]="newProduct.description" name="description" class="form-control mb-2" placeholder="Description"></textarea>
         <input [(ngModel)]="newProduct.price" name="price" class="form-control mb-2" type="number" placeholder="Price">
         <input [(ngModel)]="newProduct.category" name="category" class="form-control mb-2" placeholder="Category">
-        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+        <button type="submit" class="btn btn-success btn-sm" [disabled]="imageUploading || (imageSelected && !newProduct.imageUrl)">
+          <span *ngIf="imageUploading" class="spinner-border spinner-border-sm me-2"></span>
+          Submit
+        </button>
         <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="showAddProductForm = false">Cancel</button>
       </form>
     </div>

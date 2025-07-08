@@ -1,11 +1,14 @@
 
-/* You can add global styles to this file, and also import other style files */
+
+@use './_variables.scss' as *;
 @use './app/shared/_buttons.scss' as *;
 // @import "node_modules/bootstrap/scss/bootstrap";
 
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-base;
   background-color: #f9f9f9;
   margin: 0;
   padding: 0;
@@ -26,7 +29,7 @@ a {
 }
 
 .section-title {
-  font-weight: 600;
+  font-weight: $font-weight-bold;
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: #343a40;

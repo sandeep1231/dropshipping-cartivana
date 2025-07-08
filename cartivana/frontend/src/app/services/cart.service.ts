@@ -1,5 +1,6 @@
+
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Cart } from '../models/cart.model';
@@ -7,6 +8,22 @@ import { CartItem } from '../models/cart-item.model';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
+
+  private cartQuantity$ = new BehaviorSubject<number>(0);
+
+  getCartQuantityObservable() {
+    return this.cartQuantity$.asObservable();
+  }
+
+  setCartQuantity(qty: number) {
+    this.cartQuantity$.next(qty);
+  }
+
+  refreshCartQuantity() {
+    this.getCart().subscribe(cart => {
+      this.setCartQuantity(cart?.totalQuantity || 0);
+    });
+  }
 
     constructor(private http: HttpClient) {}
   cartKey = 'cartItems';

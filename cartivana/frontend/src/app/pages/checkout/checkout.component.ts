@@ -24,6 +24,9 @@ export class CheckoutComponent implements OnInit {
     paymentMethod: 'cod'
   };
 
+  errors: { [key: string]: string } = {};
+  orderError: string = '';
+
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
@@ -39,10 +42,16 @@ export class CheckoutComponent implements OnInit {
 //   }
 
   placeOrder() {
-    if (!this.form.name || !this.form.address || !this.form.city || !this.form.pincode || !this.form.phone) {
-      alert('Please fill all fields');
-      return;
-    }
+    this.errors = {};
+    this.orderError = '';
+    // Inline validation
+    if (!this.form.name) this.errors['name'] = 'Full Name is required';
+    if (!this.form.address) this.errors['address'] = 'Address is required';
+    if (!this.form.city) this.errors['city'] = 'City is required';
+    if (!this.form.pincode) this.errors['pincode'] = 'Pincode is required';
+    if (!this.form.phone) this.errors['phone'] = 'Phone is required';
+
+    if (Object.keys(this.errors).length > 0) return;
 
     if (!this.cartItems) return;
     const products = this.cartItems.items.map((item) => ({
@@ -57,12 +66,11 @@ export class CheckoutComponent implements OnInit {
 
     this.orderService.placeOrder(orderPayload).subscribe({
       next: (res: Order) => {
-        alert('✅ Order placed successfully!');
         this.cartService.clearCart();
-        this.router.navigate(['/']);
+        this.router.navigate(['/order-confirmation'], { queryParams: { orderId: res._id } });
       },
       error: () => {
-        alert('❌ Failed to place order.');
+        this.orderError = 'Failed to place order. Please try again.';
       }
     });
   }

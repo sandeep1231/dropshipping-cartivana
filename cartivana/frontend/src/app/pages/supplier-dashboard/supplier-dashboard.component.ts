@@ -3,7 +3,10 @@ import { AuthService } from '../../services/auth.service';
 import { SupplierService } from '../../services/supplier.service';
 import { Product } from '../../models/api-models';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { ChartData, ChartOptions, ChartType } from 'chart.js';
+// import { environment } from '../../environments/environment';
+// import { ProductService } from '../../services/product.service';
 // import { SupplierService } from 'src/app/services/supplier.service';
 // import { AuthService } from 'src/app/services/auth.service';
 
@@ -24,6 +27,8 @@ export class SupplierDashboardComponent implements OnInit {
     price: 0,
     category: ''
   };
+  imageUploading = false;
+  imageSelected = false;
   showAddProductForm = false;
   editingProduct: Product | null = null;
   searchText = '';
@@ -57,10 +62,13 @@ barChartData: ChartData<'bar', number[], string> = {
 
   
 
+
+
   constructor(
     public auth: AuthService,
     private supplierService: SupplierService,
-    private http: HttpClient
+    private http: HttpClient,
+    // private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -98,9 +106,16 @@ barChartData: ChartData<'bar', number[], string> = {
     });
   }
   addProduct() {
+    // If an image was selected but not uploaded yet, prevent submit
+    if (this.imageSelected && (this.imageUploading || !this.newProduct.imageUrl)) {
+      alert('Please wait for the image to finish uploading.');
+      return;
+    }
     this.supplierService.addProduct(this.newProduct).subscribe(() => {
       this.showAddProductForm = false;
       this.newProduct = { _id: '', name: '', imageUrl: '', description: '', price: 0, category: '' };
+      this.imageUploading = false;
+      this.imageSelected = false;
       this.loadProducts();
     });
   }
@@ -137,15 +152,25 @@ totalPages(): number {
   return Math.ceil(this.myProducts.length / this.itemsPerPage);
 }
 
-uploadFile(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files || input.files.length === 0) return;
-  const file = input.files[0];
-  const formData = new FormData();
-  formData.append('image', file);
-  this.http.post<{ imageUrl: string }>('http://localhost:5000/api/upload', formData).subscribe(res => {
-    this.newProduct.imageUrl = res.imageUrl;
-  });
-}
+  uploadFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('image', file);
+    this.imageUploading = true;
+    this.imageSelected = true;
+    this.http.post<{ imageUrl: string }>(`${environment.apiUrl}/upload`, formData).subscribe({
+      next: (res) => {
+        this.newProduct.imageUrl = res.imageUrl;
+        this.imageUploading = false;
+      },
+      error: () => {
+        this.imageUploading = false;
+        alert('Image upload failed. Please try again.');
+      }
+    });
+  }
+  // Cleaned up duplicate addProduct and productService usage
   
 }

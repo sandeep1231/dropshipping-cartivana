@@ -5,14 +5,29 @@ const Cart = require("../models/Cart");
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
+
+// Always return a cart object with items, totalQuantity, totalPrice
 exports.getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.user._id })
-      .populate('items.product'); // ✅ populate nested product
-
-    if (!cart) return res.json({ items: [], total: 0 });
-
-    res.json(cart);
+    let cart = await Cart.findOne({ user: req.user._id, status: 'active' }).populate('items.product');
+    if (!cart) {
+      cart = await Cart.create({ user: req.user._id, items: [], status: 'active' });
+    }
+    // Calculate and update totals in DB
+    const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cart.items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
+    cart.totalQuantity = totalQuantity;
+    cart.totalPrice = totalPrice;
+    await cart.save();
+    res.json({
+      _id: cart._id,
+      user: cart.user,
+      items: cart.items,
+      totalQuantity: cart.totalQuantity,
+      totalPrice: cart.totalPrice,
+      status: cart.status,
+      updatedAt: cart.updatedAt
+    });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch cart' });
   }
@@ -24,36 +39,41 @@ exports.getCart = async (req, res) => {
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
+
+// Always use the active cart, create if not exists, and return consistent structure
 exports.addToCart = async (req, res) => {
   const { productId, quantity = 1 } = req.body;
-
-  if (!productId) {
-    return res.status(400).json({ message: 'Product ID is required' });
-  }
+  if (!productId) return res.status(400).json({ message: 'Product ID is required' });
 
   try {
-    let cart = await Cart.findOne({ user: req.user._id });
-
+    let cart = await Cart.findOne({ user: req.user._id, status: 'active' });
     if (!cart) {
-      cart = new Cart({
-        user: req.user._id,
-        items: [{ product: productId, quantity }]
-      });
-    } else {
-      const existingItem = cart.items.find(item => item.product.toString() === productId);
-
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.items.push({ product: productId, quantity });
-      }
+      cart = await Cart.create({ user: req.user._id, items: [], status: 'active' });
     }
-
-    const updated = await cart.save();
-    const populated = await updated.populate('items.product');
-    res.json(populated);
+    const existingItem = cart.items.find(item => item.product.toString() === productId);
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.items.push({ product: productId, quantity });
+    }
+    await cart.save();
+    await cart.populate('items.product');
+    // Calculate and update totals in DB
+    const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cart.items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
+    cart.totalQuantity = totalQuantity;
+    cart.totalPrice = totalPrice;
+    await cart.save();
+    res.json({
+      _id: cart._id,
+      user: cart.user,
+      items: cart.items,
+      totalQuantity: cart.totalQuantity,
+      totalPrice: cart.totalPrice,
+      status: cart.status,
+      updatedAt: cart.updatedAt
+    });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: 'Failed to add to cart' });
   }
 };

@@ -22,15 +22,14 @@ exports.placeOrder = async (req, res) => {
     // 2. Build order items with detailed info
     const orderItems = cart.items.map(item => {
       const product = item.product;
-
       if (!product) throw new Error('Product not found in cart');
-
       return {
         product: product._id,
         name: product.name,
         price: product.price,
         quantity: item.quantity,
-        supplier: product.supplier
+        supplier: product.supplier,
+        status: 'pending' // Set per-item status
       };
     });
 
@@ -40,26 +39,37 @@ exports.placeOrder = async (req, res) => {
     const order = new Order({
       user: userId,
       products: orderItems,
-      totalAmount,
-      status: 'pending'
+      totalAmount
     });
 
-    const saved = await order.save();
+    let saved;
+    try {
+      saved = await order.save();
+    } catch (err) {
+      // If order save fails, do NOT touch the cart
+      console.error(err);
+      return res.status(500).json({ message: 'Order failed', error: err.message });
+    }
 
-    // 4. Clear the user's cart
+    // 4. Mark the user's cart as inactive (do not delete)
     cart.status = 'inactive';
     await cart.save();
 
-    // ✅ 5. Create a new active cart for user (optional)
-    await Cart.create({ user: userId, items: [], status: 'active' });
+    // 5. Create a new active cart for user (if not present)
+    const existingActive = await Cart.findOne({ user: userId, status: 'active' });
+    if (!existingActive) {
+      await Cart.create({ user: userId, items: [], status: 'active' });
+    }
+
     // 6. Populate final order for response
     const populated = await Order.findById(saved._id)
       .populate('user', 'name email')
-      .populate('products.product', 'name price')
+      .populate('products.product', 'name price sku')
       .populate('products.supplier', 'name email');
 
     res.status(201).json(populated);
   } catch (err) {
+    // If any error occurs before order save, cart is untouched
     console.error(err);
     res.status(500).json({ message: 'Order failed', error: err.message });
   }
@@ -87,7 +97,7 @@ exports.getMyOrdersForUser = async (req, res) => {
       }
   
       const orders = await Order.find({ user: userId })
-        .populate({ path: 'products.product', select: 'name price' })
+        .populate({ path: 'products.product', select: 'name price sku' })
         .populate({ path: 'products.supplier', select: 'name email' });
   
       return res.json(orders);
@@ -102,7 +112,7 @@ exports.getOrderByIdForUser = async (req, res) => {
       _id: req.params.id,
       user: req.user._id
     })
-      .populate('products.product', 'name price')
+      .populate('products.product', 'name price sku')
       .populate('products.supplier', 'name email');
 
     if (!order) return res.status(404).json({ message: 'Order not found' });

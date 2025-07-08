@@ -18,14 +18,14 @@
       <div class="mb-2">
         <span class="badge bg-primary bg-gradient me-2">{{ product!.category }}</span>
       </div>
-      <h3 class="text-primary mb-3">9{{ product!.price | currency:'INR' }}</h3>
       <p class="mb-2">{{ product!.description }}</p>
       <p class="text-muted small mb-3">{{ product!.details }}</p>
-      <div class="d-flex align-items-center mb-3">
-        <label class="me-2 mb-0">Quantity:</label>
-        <input type="number" [(ngModel)]="quantity" class="form-control form-control-sm w-25" min="1" />
+      <div class="d-flex align-items-center mb-3 gap-3">
+        <label class="me-2 mb-0">Qty:</label>
+        <input type="number" [(ngModel)]="quantity" class="form-control form-control-sm" style="width: 60px;" min="1" />
+        <span class="ms-2 fw-semibold text-primary" style="min-width: 70px;">{{ product!.price | currency:'INR' }}</span>
       </div>
-      <button class="btn btn-primary btn-lg px-5 py-2 mt-2" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
+      <button class="btn btn-success add-to-cart-btn btn-lg px-5 py-2 mt-2" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
     </div>
   </div>
 

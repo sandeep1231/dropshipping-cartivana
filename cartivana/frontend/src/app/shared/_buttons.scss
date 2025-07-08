@@ -1,10 +1,11 @@
+@use '../../_variables.scss' as *;
 // Global button styles for uniformity across the app
 .btn, .btn:focus, .btn:active {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
+  font-family: $font-family-base;
+  font-weight: $font-weight-bold;
   border-radius: 8px;
   padding: 0.5rem 1.5rem;
-  font-size: 1rem;
+  font-size: $font-size-base;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(13, 110, 253, 0.04);
   outline: none;

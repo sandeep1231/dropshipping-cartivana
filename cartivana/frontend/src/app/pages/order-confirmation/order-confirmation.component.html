@@ -1,0 +1,26 @@
+<div class="order-confirmation-bg">
+  <div class="order-confirmation-container">
+    <div class="order-confirmation-icon">✅</div>
+    <h2 class="order-confirmation-title">Thank you for your order!</h2>
+    <div *ngIf="order">
+      <div class="order-summary-card">
+        <h4>Order Summary</h4>
+        <div class="order-summary-row"><span>Order ID:</span> <span>{{ order._id }}</span></div>
+        <!-- Removed overall order status: now per-item only -->
+        <div class="order-summary-row"><span>Placed On:</span> <span>{{ order.createdAt | date:'medium' }}</span></div>
+        <div class="order-summary-row"><span>Total:</span> <span>₹{{ order.totalAmount }}</span></div>
+        <div class="order-summary-products">
+          <h5>Products:</h5>
+          <ul>
+            <li *ngFor="let item of order.products">
+              <span class="product-name">{{ item.name || item.product.name }}</span>
+              <span class="product-qty">x{{ item.quantity }}</span>
+              <span class="product-price">₹{{ item.price || item.product.price }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a routerLink="/products" class="btn btn-success mt-4">Continue Shopping</a>
+  </div>
+</div>

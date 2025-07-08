@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -8,8 +10,23 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./navbar.component.scss'],
   standalone: false
 })
-export class NavbarComponent {
-  constructor(public auth: AuthService, private router: Router) {}
+export class NavbarComponent implements OnInit, OnDestroy {
+  cartQuantity = 0;
+  private cartSub?: Subscription;
+
+  constructor(public auth: AuthService, private router: Router, public cartService: CartService) {}
+
+  ngOnInit() {
+    this.cartSub = this.cartService.getCartQuantityObservable().subscribe(qty => {
+      this.cartQuantity = qty;
+    });
+    // Initial fetch
+    this.cartService.refreshCartQuantity();
+  }
+
+  ngOnDestroy() {
+    this.cartSub?.unsubscribe();
+  }
 
   logout() {
     this.auth.logout();

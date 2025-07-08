@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/api-models';
+import { environment } from '../../../environments/environment';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-products',
@@ -10,7 +12,11 @@ import { Product } from '../../models/api-models';
   standalone: false
 })
 export class ProductsComponent implements OnInit {
-    constructor(private cartService: CartService, private productService: ProductService){}
+    constructor(
+      private cartService: CartService,
+      private productService: ProductService,
+      private toastService: ToastService
+    ){}
   allProducts: Product[] = [];
   filteredProducts: Product[] = [];
   categories = ['All', 'Woodcraft', 'Textiles', 'Jewelry', 'Paintings'];
@@ -19,9 +25,21 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe((data: Product[]) => {
-        this.allProducts = data;
-        this.filteredProducts = [...this.allProducts];
-  });
+      // Fix imageUrl for backend-served images
+      this.allProducts = data.map(p => ({
+        ...p,
+        imageUrl: p.imageUrl && p.imageUrl.startsWith('/uploads')
+          ? environment.apiUrl.replace(/\/api$/, '') + p.imageUrl
+          : p.imageUrl
+      }));
+      this.filteredProducts = [...this.allProducts];
+      // Initialize quantities to 1 for each product
+      this.filteredProducts.forEach(p => {
+        if (!this.quantities[p._id]) {
+          this.quantities[p._id] = 1;
+        }
+      });
+    });
     // this.allProducts = [
     //   { id: '1',name: 'Wooden Tray', price: 899, imageUrl: '/assets/images/woodcraft.jpg', category: 'Woodcraft' },
     //   { id: '2',name: 'Pattachitra Painting', price: 1499, imageUrl: '/assets/images/paintings.jpg', category: 'Paintings' },
@@ -41,7 +59,8 @@ export class ProductsComponent implements OnInit {
 
   addToCart(productId: string, quantity: number = 1): void {
     this.cartService.addToCart(productId, quantity).subscribe(() => {
-      alert('Added to cart!');
+      this.toastService.showToast('Product added to cart!', 'success');
+      this.cartService.refreshCartQuantity();
     });
   }
 }

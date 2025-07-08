@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ToastService } from '../../services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/api-models';
+import { environment } from '../../../environments/environment';
 import { ProductService } from '../../services/product.service';
 
 @Component({
@@ -41,14 +43,24 @@ export class ProductDetailComponent implements OnInit {
         details: 'Material: Mixed Alloy | Adjustable | Delivered in 4-6 days' }
   ];
 
-  constructor(private route: ActivatedRoute, private cartService: CartService, private productService: ProductService, public cd: ChangeDetectorRef) {}
+  constructor(
+    private route: ActivatedRoute,
+    private cartService: CartService,
+    private productService: ProductService,
+    public cd: ChangeDetectorRef,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.productService.getProductById(id).subscribe((data: Product) => {
-      // Add dummy description for demo
+      // Fix imageUrl for backend-served images
+      const fixedImageUrl = data.imageUrl && data.imageUrl.startsWith('/uploads')
+        ? environment.apiUrl.replace(/\/api$/, '') + data.imageUrl
+        : data.imageUrl;
       this.product = {
         ...data,
+        imageUrl: fixedImageUrl,
         description: data.description || 'This is a beautiful handcrafted product from Odisha, made with care and tradition. Perfect for your home or as a unique gift. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, nisi eu consectetur.'
       };
       this.cd.detectChanges();
@@ -56,7 +68,8 @@ export class ProductDetailComponent implements OnInit {
   }
   addToCart(productId: string , quantity: number): void {
     this.cartService.addToCart(productId, quantity).subscribe(() => {
-      alert('Product added to cart!');
+      this.toastService.showToast('Product added to cart!', 'success');
+      this.cartService.refreshCartQuantity();
     });
   }
 }

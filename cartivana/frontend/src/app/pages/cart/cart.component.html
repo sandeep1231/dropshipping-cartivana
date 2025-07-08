@@ -1,44 +1,66 @@
+<div *ngIf="loading" class="global-loader">
+  <app-spinner></app-spinner>
+</div>
 
-<div class="container mt-5" *ngIf="cart?.items?.length; else emptyCart">
-    <h2 class="section-title">🛒 Your Cart</h2>
-  
-    <div class="table-responsive mt-4">
-      <table class="table table-striped align-middle">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th class="text-center">Price</th>
-            <th class="text-center">Qty</th>
-            <th class="text-center">Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let cartItem of cart?.items">
-            <td>{{ cartItem.product.name }}</td>
-            <td class="text-center">₹{{ cartItem.product.price }}</td>
-            <td class="text-center">
-              <input type="number" [(ngModel)]="cartItem.quantity" (change)="updateQty(cartItem._id, cartItem.quantity)" min="1" class="form-control form-control-sm text-center" style="width: 60px;">
-            </td>
-            <td class="text-center">₹{{ cartItem.product.price * cartItem.quantity }}</td>
-            <td class="text-end">
-              <button (click)="removeItem(cartItem._id)" class="btn btn-outline-danger btn-sm">Remove</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+<div class="container cart-area mt-5" *ngIf="!loading && cart?.items?.length; else emptyCart">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title mb-0">🛒 Your Cart</h2>
+      <a routerLink="/products" class="btn btn-link text-primary fw-semibold">&larr; Continue Shopping</a>
     </div>
   
-    <div class="text-end mt-4">
-      <h5>Total: ₹{{ cart?.totalPrice }}</h5>
-      <a routerLink="/checkout" class="btn btn-primary btn-lg mt-2">Proceed to Checkout</a>
+    <div class="row g-4">
+      <div class="col-12" *ngFor="let cartItem of cart?.items; let last = last">
+        <div class="card cart-item-card shadow-sm border-0 d-flex flex-row align-items-center p-3 gap-3 flex-wrap flex-md-nowrap">
+          <img [src]="cartItem.product.imageUrl || '/assets/images/placeholder.png'" alt="{{cartItem.product.name}}" class="cart-img">
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <a [routerLink]="['/product', cartItem.product._id]" class="fw-semibold cart-product-link mb-0">{{ cartItem.product.name }}</a>
+              <span class="badge bg-success bg-opacity-10 text-success fw-normal" style="font-size:0.85rem;">In Stock</span>
+            </div>
+            <div class="text-muted small mb-1" *ngIf="cartItem.product.description">{{ cartItem.product.description }}</div>
+            <div class="d-flex flex-wrap gap-3 mt-2 align-items-center">
+              <span class="text-primary fw-semibold">₹{{ cartItem.product.price }}</span>
+              <span class="text-muted">x</span>
+              <input type="number" [(ngModel)]="cartItem.quantity" (change)="updateQty(cartItem._id, cartItem.quantity)" min="1" class="form-control form-control-sm text-center cart-qty-input">
+              <span class="fw-semibold">= ₹{{ cartItem.product.price * cartItem.quantity }}</span>
+            </div>
+          </div>
+          <button (click)="removeItem(cartItem._id)" class="btn btn-danger btn-sm rounded-pill d-flex align-items-center gap-1 cart-remove-btn ms-auto" title="Remove">
+            <span class="bi bi-trash"></span>
+            <span class="d-none d-md-inline">Remove</span>
+          </button>
+        </div>
+        <div *ngIf="!last" class="cart-divider my-2"></div>
+      </div>
+    </div>
+  
+    <div class="row mt-5 justify-content-end">
+      <div class="col-12 col-md-6">
+        <div class="card cart-summary-card p-4 border-0 shadow-sm">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="fw-semibold">Subtotal</span>
+            <span>₹{{ cart?.totalPrice }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="fw-semibold">Shipping</span>
+            <span class="text-success">FREE</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold fs-5">Total</span>
+            <span class="fw-bold fs-5 text-primary">₹{{ cart?.totalPrice }}</span>
+          </div>
+          <a routerLink="/checkout" class="btn btn-success btn-lg w-100 proceed-checkout-btn">Proceed to Checkout</a>
+        </div>
+      </div>
     </div>
   </div>
   
   <ng-template #emptyCart>
-    <div class="text-center mt-5">
-      <h3>Your cart is empty 😢</h3>
-      <a routerLink="/products" class="btn btn-outline-primary mt-3">Browse Products</a>
+    <div class="empty-cart-container d-flex flex-column align-items-center justify-content-center">
+      <img src="/assets/images/empty-cart.svg" alt="Empty cart" class="empty-cart-img mb-4" />
+      <h2 class="empty-cart-title mb-2">Your cart is empty <span aria-label="sad" role="img">😢</span></h2>
+      <p class="empty-cart-desc mb-4">Looks like you haven’t added anything to your cart yet.</p>
+      <a routerLink="/products" class="btn btn-primary btn-lg">Browse Products</a>
     </div>
   </ng-template>
-  

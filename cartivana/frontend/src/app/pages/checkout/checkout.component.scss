@@ -1,0 +1,132 @@
+@use '../../../_variables.scss' as *;
+
+// Modern, dashing checkout page styles
+.checkout-bg {
+  min-height: 80vh;
+  background: #fafbfc;
+  padding: 40px 0 60px 0;
+}
+
+.checkout-container {
+  max-width: 950px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px 0 rgba(60,72,88,0.10);
+  padding: 32px 32px 24px 32px;
+}
+
+.section-title {
+  font-size: 2.1rem; // keep as is for heading
+  font-weight: 700;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -1px;
+}
+.checkout-icon {
+  font-size: 2.2rem; // keep as is for heading
+}
+
+.checkout-content {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.checkout-card {
+  background: #f7fafd;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px 0 rgba(60,72,88,0.07);
+  padding: 28px 24px 24px 24px;
+  flex: 1 1 340px;
+  min-width: 320px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+.shipping-card {
+  margin-right: 0;
+}
+.summary-card {
+  margin-left: 0;
+}
+.card-title {
+  font-size: $font-size-md;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+  background: transparent;
+  padding: 12px 0 8px 0;
+  border-bottom: 1px solid #e6eaf0;
+}
+.order-item:last-child {
+  border-bottom: none;
+}
+.order-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.order-item-name {
+  font-weight: 500;
+  font-size: $font-size-base;
+}
+.order-item-qty {
+  font-size: $font-size-sm;
+  color: #7a8599;
+}
+.order-item-price {
+  font-weight: 500;
+  font-size: $font-size-base;
+}
+.order-total {
+  font-size: $font-size-md;
+  font-weight: 600;
+  border-top: 2px solid #e6eaf0;
+  background: #f2f7fa;
+}
+
+.payment-section {
+  margin-top: 18px;
+}
+.place-order-btn {
+  font-size: $font-size-md;
+  font-weight: 600;
+  background: linear-gradient(90deg, #0ba360 0%, #3cba92 100%);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 rgba(60,72,88,0.08);
+  transition: background 0.2s;
+}
+.place-order-btn:hover {
+  background: linear-gradient(90deg, #3cba92 0%, #0ba360 100%);
+}
+.back-to-cart-link {
+  color: #0ba360;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: $font-size-base;
+  transition: color 0.2s;
+}
+.back-to-cart-link:hover {
+  color: #3cba92;
+}
+
+@media (max-width: 900px) {
+  .checkout-content {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .checkout-card {
+    min-width: 0;
+    width: 100%;
+  }
+}

@@ -6,19 +6,20 @@ export interface User {
     token?: string;
   }
   
-  export interface Product {
-    rejectionReason?: string; // was any
-    status?: string;
-    _id: string;
-    name: string;
-    description: string;
-    price: number;
-    imageUrl?: string;
-    category: string;
-    supplier?: User;
-    details?: string;
-    specs?: string[]; // Array of product specifications
-  }
+export interface Product {
+  rejectionReason?: string; // was any
+  status?: string;
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl?: string;
+  category: string;
+  supplier?: User;
+  details?: string;
+  specs?: string[]; // Array of product specifications
+  sku?: string;
+}
   
 export interface OrderItem {
   product: Product;
@@ -26,13 +27,13 @@ export interface OrderItem {
   name?: string;
   price?: number;
   supplier?: User;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 }
   
   export interface Order {
     _id: string;
     products: OrderItem[];
     totalAmount: number;
-    status: string;
     createdAt: string;
   }
   

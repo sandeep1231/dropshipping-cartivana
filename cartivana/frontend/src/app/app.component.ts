@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ToastComponent } from './components/toast/toast.component';
 import { RouterOutlet } from '@angular/router';
 
 @Component({

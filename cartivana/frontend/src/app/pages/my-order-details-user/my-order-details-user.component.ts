@@ -6,6 +6,7 @@ import { Order } from '../../models/api-models';
 @Component({
   selector: 'app-my-order-details-user',
   templateUrl: './my-order-details-user.component.html',
+  styleUrls: ['./my-order-details-user.component.scss'],
   standalone: false
 })
 export class MyOrderDetailsUserComponent implements OnInit {
@@ -22,5 +23,9 @@ export class MyOrderDetailsUserComponent implements OnInit {
         this.loading = false;
       });
     }
+  }
+  isStepActive(step: string): boolean {
+    if (!this.order || !this.order.products) return false;
+    return this.order.products.some(item => item.status === step.toLowerCase());
   }
 }

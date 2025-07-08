@@ -1,0 +1,15 @@
+@use '../../../_variables.scss' as *;
+.toast-container {
+  z-index: 1200;
+}
+.toast {
+  min-width: 220px;
+  font-weight: 600;
+  font-size: $font-size-base;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  opacity: 0.98;
+}
+.toast-body {
+  padding: 0.75rem 1.25rem;
+}

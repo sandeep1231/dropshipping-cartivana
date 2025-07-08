@@ -14,5 +14,6 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
   specs?: string[]; // Array of product specifications
+  sku?: string;
 }
   

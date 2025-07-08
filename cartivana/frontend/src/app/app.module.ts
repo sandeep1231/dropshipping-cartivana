@@ -1,3 +1,5 @@
+import { ToastComponent } from './components/toast/toast.component';
+    ToastComponent;
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -34,6 +36,11 @@ import { AuthGuard } from './guards/auth.guard';
 import { MyOrdersUserComponent } from './pages/my-orders-user/my-orders-user.component';
 import { MyOrderDetailsUserComponent } from './pages/my-order-details-user/my-order-details-user.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { SpinnerComponent } from './components/spinner/spinner.component';
+import { OrderConfirmationComponent } from './pages/order-confirmation/order-confirmation.component';
+import { OrderSummaryStatusPipe } from './pipes/order-summary-status.pipe';
+
+
 
 @NgModule({
   declarations: [
@@ -56,6 +63,9 @@ import { ProfileComponent } from './pages/profile/profile.component';
     MyOrdersUserComponent,
     MyOrderDetailsUserComponent,
     ProfileComponent,
+    ToastComponent,
+    SpinnerComponent,
+    OrderConfirmationComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,6 +73,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
     FormsModule,
     ReactiveFormsModule,
     NgChartsModule,
+    OrderSummaryStatusPipe,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'products', component: ProductsComponent },
@@ -107,6 +118,10 @@ import { ProfileComponent } from './pages/profile/profile.component';
                                 path: 'my-orders/:id',
                                 component: MyOrderDetailsUserComponent,
                                 canActivate: [AuthGuard]
+                              },
+                              {
+                                path: 'order-confirmation',
+                                component: OrderConfirmationComponent
                               }
     ])
   ],

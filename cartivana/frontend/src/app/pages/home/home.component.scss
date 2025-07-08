@@ -1,3 +1,18 @@
+@use '../../../_variables.scss' as *;
+// Consistent Add to Cart button style
+.add-to-cart-btn {
+  font-weight: 600;
+  background: linear-gradient(90deg, #0ba360 0%, #3cba92 100%);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 rgba(60,72,88,0.08);
+  color: #fff;
+  transition: background 0.2s;
+}
+.add-to-cart-btn:hover {
+  background: linear-gradient(90deg, #3cba92 0%, #0ba360 100%);
+  color: #fff;
+}
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
 
 .hero-section {
@@ -11,7 +26,7 @@
   }
   
   .section-title {
-    font-size: 2rem;
+    font-size: $font-size-lg;
     font-weight: 700;
     color: #343a40;
     border-bottom: 2px solid #dee2e6;
@@ -42,12 +57,12 @@
   
     .card-title {
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: $font-size-md;
     }
   }
 
   .icon-box {
-    font-size: 2.2rem;
+    font-size: 2.2rem; // keep as is for hero/large
     color: #0d6efd;
     margin-bottom: 0.5rem;
   }
@@ -61,7 +76,7 @@
     cursor: pointer;
   
     .cat-icon {
-      font-size: 2.5rem;
+      font-size: 2.5rem; // keep as is for hero/large
       margin-bottom: 0.5rem;
     }
   

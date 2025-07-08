@@ -1,41 +1,68 @@
-<div class="container mt-4" *ngIf="!loading && order">
-    <h4>📄 Order #{{ order._id }}</h4>
-  
-    <div class="card mt-3">
-      <div class="card-body">
-        <p><strong>Status:</strong> {{ order.status | titlecase }}</p>
-        <p><strong>Date:</strong> {{ order.createdAt | date:'short' }}</p>
-        <p><strong>Total:</strong> ₹{{ order.totalAmount }}</p>
+
+
+<div class="order-details-bg">
+  <div class="order-details-container" *ngIf="!loading && order">
+    <div class="order-details-title">
+      🧾 Order #{{ order._id }}
+    </div>
+    <div class="order-summary-card">
+      <div class="order-summary-info">
+        <div><strong>Order ID:</strong> {{ order._id }}</div>
+        <div><strong>Placed On:</strong> {{ order.createdAt | date:'medium' }}</div>
+        <div><strong>Total:</strong> ₹{{ order.totalAmount }}</div>
+        <div><strong>Order Status:</strong>
+          <span class="order-status-badge" *ngIf="order.products.length > 0">
+            {{ order.products | orderSummaryStatus | titlecase }}
+          </span>
+        </div>
+      </div>
+      <div class="order-summary-extra">
+        <div><strong>Shipping Address:</strong> <span class="text-muted">(Coming soon)</span></div>
+        <div><strong>Payment Method:</strong> <span class="text-muted">(Coming soon)</span></div>
+        <div><strong>Order Notes:</strong> <span class="text-muted">(Coming soon)</span></div>
+      </div>
+      <div class="order-timeline">
+        <strong>Order Timeline:</strong>
+        <div class="timeline-bar">
+          <span *ngFor="let step of ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled']; let i = index"
+                [class.active]="isStepActive(step)">
+            {{ step }}<span *ngIf="i < 4"> &rarr; </span>
+          </span>
+        </div>
       </div>
     </div>
-  
-    <h5 class="mt-4">Products</h5>
-    <table class="table table-sm table-striped">
-      <thead class="table-light">
-        <tr>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Supplier</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of order.products">
-          <td>{{ item.product.name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>₹{{ item.price }}</td>
-          <td>
-            {{ item.supplier?.name }}<br>
-            <small>{{ item.supplier?.email }}</small>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="products-title">Products</div>
+    <div class="products-list">
+      <div class="product-card" *ngFor="let item of order.products">
+        <img *ngIf="item.product.imageUrl" [src]="item.product.imageUrl" class="product-image" alt="{{ item.product.name }}" />
+        <div class="product-info">
+          <div class="product-name">
+            <a [routerLink]="['/product', item.product._id]">{{ item.product.name }}</a>
+          </div>
+          <div class="product-sku" *ngIf="item.product.sku"><strong>SKU:</strong> {{ item.product.sku }}</div>
+          <div class="product-category" *ngIf="item.product.category"><strong>Category:</strong> {{ item.product.category }}</div>
+          <div class="product-qty">Qty: {{ item.quantity }}</div>
+          <div class="product-price">Price: ₹{{ item.price }}</div>
+          <div class="product-status">
+            <strong>Status:</strong>
+            <span class="order-status-badge {{ item.status | titlecase }}">{{ item.status | titlecase }}</span>
+          </div>
+        </div>
+        <div class="product-supplier" *ngIf="item.supplier">
+          <div><span class="supplier-avatar">👤</span> Supplier: {{ item.supplier.name }}</div>
+          <div style="font-size:0.95em;"><a href="mailto:{{ item.supplier.email }}">{{ item.supplier.email }}</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="order-details-footer">
+      <a routerLink="/my-orders" class="btn btn-outline-primary btn-lg me-2">Back to My Orders</a>
+      <a routerLink="/products" class="btn btn-success btn-lg">Continue Shopping</a>
+    </div>
   </div>
-  
   <div class="text-center my-5" *ngIf="loading">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
+  </div>
 </div>
   

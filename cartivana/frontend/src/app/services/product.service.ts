@@ -21,5 +21,8 @@ export class ProductService {
   getFeatured(): Observable<Product[]> {
     return this.http.get<Product[]>(`${environment.apiUrl}/products/featured`);
   }
-  
+
+  createProduct(product: any) {
+    return this.http.post(`${this.API_URL}`, product);
+  }
 }
