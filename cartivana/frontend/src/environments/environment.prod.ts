@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://your-live-api-url.com/api'
+    apiUrl: 'https://api.odlocal.com/api'
   };
   
