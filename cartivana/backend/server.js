@@ -19,7 +19,8 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  // origin: process.env.CLIENT_URL,
+  origin: ['https://odlocal.com', 'https://www.odlocal.com', 'http://localhost:4200'],
   credentials: true
 }));
 
