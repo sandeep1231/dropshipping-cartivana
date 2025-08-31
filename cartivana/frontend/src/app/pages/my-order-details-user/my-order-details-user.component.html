@@ -34,7 +34,7 @@
     <div class="products-title">Products</div>
     <div class="products-list">
       <div class="product-card" *ngFor="let item of order.products">
-        <img *ngIf="item.product.imageUrl" [src]="item.product.imageUrl" class="product-image" alt="{{ item.product.name }}" />
+        <img *ngIf="item.product.imageUrls && item.product.imageUrls.length > 0" [src]="item.product.imageUrls[0]" class="product-image" alt="{{ item.product.name }}" />
         <div class="product-info">
           <div class="product-name">
             <a [routerLink]="['/product', item.product._id]">{{ item.product.name }}</a>

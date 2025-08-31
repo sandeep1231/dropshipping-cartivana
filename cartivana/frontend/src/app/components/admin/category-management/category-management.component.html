@@ -1,0 +1,300 @@
+<div class="category-management-page">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fas fa-tags"></i>
+        Category Management
+      </h1>
+      <p class="page-subtitle">Manage product categories for your marketplace</p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <i class="fas fa-plus"></i>
+        Add Category
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="form-control search-input" 
+        placeholder="Search categories..." 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      >
+    </div>
+    
+    <div class="results-info">
+      <span>{{ filteredCategories.length }} categories found</span>
+    </div>
+  </div>
+
+  <!-- Categories Table -->
+  <div class="table-container">
+    <div class="loading-overlay" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading categories...</p>
+    </div>
+
+    <table class="categories-table" *ngIf="!isLoading">
+      <thead>
+        <tr>
+          <th>Category Name</th>
+          <th>Parent</th>
+          <th>Description</th>
+          <th>Products</th>
+          <th>Status</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of getPaginatedCategories()" [class.inactive]="!category.isActive">
+          <td class="category-name">
+            <div class="name-cell">
+              <span *ngIf="category.parentCategory" class="text-muted me-2">└─</span>
+              <strong>{{ category.name }}</strong>
+              <small class="slug">{{ category.slug }}</small>
+            </div>
+          </td>
+          
+          <td class="parent-category">
+            <span *ngIf="category.parentCategory" class="parent-badge">
+              {{ getParentCategoryName(category.parentCategory) }}
+            </span>
+            <span *ngIf="!category.parentCategory" class="text-muted">Top Level</span>
+          </td>
+          
+          <td class="description">
+            <span class="description-text">{{ category.description || 'No description' }}</span>
+          </td>
+          
+          <td class="product-count">
+            <span class="count-badge" [class.has-products]="category.productCount && category.productCount > 0">
+              {{ category.productCount || 0 }}
+            </span>
+          </td>
+          
+          <td class="status">
+            <span class="status-badge" [class.active]="category.isActive" [class.inactive]="!category.isActive">
+              {{ category.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          
+          <td class="display-order">
+            <span class="order-number">{{ category.displayOrder }}</span>
+          </td>
+          
+          <td class="actions">
+            <div class="action-buttons">
+              <button class="btn-icon btn-edit" (click)="openEditModal(category)" title="Edit Category">
+                <i class="fas fa-edit"></i>
+              </button>
+              
+              <button 
+                class="btn-icon btn-toggle" 
+                (click)="toggleActiveStatus(category)" 
+                [title]="category.isActive ? 'Deactivate' : 'Activate'"
+              >
+                <i class="fas" [class.fa-eye]="category.isActive" [class.fa-eye-slash]="!category.isActive"></i>
+              </button>
+              
+              <button 
+                class="btn-icon btn-delete" 
+                (click)="deleteCategory(category)" 
+                title="Delete Category"
+                [class.has-products]="category.productCount && category.productCount > 0"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredCategories.length === 0">
+      <i class="fas fa-tags empty-icon"></i>
+      <h3>No categories found</h3>
+      <p *ngIf="searchTerm">Try adjusting your search terms</p>
+      <p *ngIf="!searchTerm">Get started by creating your first category</p>
+      <button class="btn btn-primary" (click)="openCreateModal()" *ngIf="!searchTerm">
+        <i class="fas fa-plus"></i>
+        Create Category
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <nav aria-label="Categories pagination">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </li>
+        
+        <li class="page-item" 
+            *ngFor="let page of getPageNumbers()" 
+            [class.active]="page === currentPage">
+          <button class="page-link" (click)="goToPage(+page)" *ngIf="page !== '...'">
+            {{ page }}
+          </button>
+          <span class="page-link" *ngIf="page === '...'">...</span>
+        </li>
+        
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="pagination-info">
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-overlay" [class.active]="showModal" (click)="closeModal()" *ngIf="showModal">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-tag"></i>
+        {{ modalMode === 'create' ? 'Create Category' : 'Edit Category' }}
+      </h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Temporary Debug Panel -->
+      <div style="background: #f8f9fa; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.8rem;">
+        <strong>Debug Info:</strong><br>
+        Modal Mode: {{ modalMode }}<br>
+        Parent Categories Count: {{ parentCategories.length }}<br>
+        Current Category ID: {{ currentCategory._id || 'none' }}<br>
+        Current Parent Category: {{ currentCategory.parentCategory || 'none' }}<br>
+        <div *ngIf="parentCategories.length > 0">
+          Available Parents:
+          <ul style="margin: 0.5rem 0;">
+            <li *ngFor="let cat of parentCategories">{{ cat.name }} ({{ cat._id }})</li>
+          </ul>
+        </div>
+      </div>
+      
+      <form (ngSubmit)="saveCategory()" novalidate>
+        <div class="form-group">
+          <label for="categoryName" class="form-label">Category Name *</label>
+          <input 
+            type="text" 
+            id="categoryName"
+            class="form-control" 
+            [(ngModel)]="currentCategory.name"
+            name="categoryName"
+            placeholder="Enter category name"
+            required
+            maxlength="100"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="categoryDescription" class="form-label">Description</label>
+          <textarea 
+            id="categoryDescription"
+            class="form-control" 
+            [(ngModel)]="currentCategory.description"
+            name="categoryDescription"
+            placeholder="Enter category description"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="parentCategory" class="form-label">Parent Category</label>
+          <div class="select-wrapper">
+            <select 
+              id="parentCategory"
+              class="form-select" 
+              [(ngModel)]="currentCategory.parentCategory"
+              name="parentCategory"
+            >
+              <option value="">── None (Top-level category) ──</option>
+              <option 
+                *ngFor="let parent of parentCategories; trackBy: trackByCategory" 
+                [value]="parent._id"
+                [disabled]="modalMode === 'edit' && parent._id === currentCategory._id"
+              >
+                {{ parent.name }}
+                <span *ngIf="getSubcategoryCount(parent._id) > 0">
+                  ({{ getSubcategoryCount(parent._id) }} subcategories)
+                </span>
+              </option>
+            </select>
+            <i class="fas fa-chevron-down select-icon"></i>
+          </div>
+          <small class="form-text text-muted">
+            <i class="fas fa-info-circle"></i>
+            Leave empty to create a top-level category, or select a parent to create a subcategory.
+          </small>
+          
+          <!-- Debug info -->
+          <div class="debug-info" *ngIf="parentCategories.length === 0" style="margin-top: 0.5rem; padding: 0.5rem; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; font-size: 0.8rem;">
+            <strong>Debug:</strong> No parent categories available. Check console for API response.
+          </div>
+          <div class="debug-info" *ngIf="parentCategories.length > 0" style="margin-top: 0.5rem; padding: 0.5rem; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; font-size: 0.8rem;">
+            <strong>Debug:</strong> {{ parentCategories.length }} parent categories loaded.
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="displayOrder" class="form-label">Display Order</label>
+            <input 
+              type="number" 
+              id="displayOrder"
+              class="form-control" 
+              [(ngModel)]="currentCategory.displayOrder"
+              name="displayOrder"
+              min="0"
+              placeholder="0"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="currentCategory.isActive"
+                name="isActive"
+              >
+              <span class="checkmark"></span>
+              Active Category
+            </label>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving || !currentCategory.name?.trim()">
+            <span *ngIf="isSaving" class="spinner-sm"></span>
+            {{ modalMode === 'create' ? 'Create Category' : 'Update Category' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

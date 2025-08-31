@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { SupplierService } from '../../services/supplier.service';
+import { ProductService } from '../../services/product.service';
+import { CategoryService, Category } from '../../services/category.service';
 import { Product } from '../../models/api-models';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -17,18 +19,23 @@ import { ChartData, ChartOptions, ChartType } from 'chart.js';
   standalone: false
 })
 export class SupplierDashboardComponent implements OnInit {
+  environment = environment;
+  get asyncUploading(): boolean {
+    return Array.isArray(this.imageUploading) && this.imageUploading.some(u => u);
+  }
   myProducts: Product[] = [];
   rejectedProducts: Product[] = [];
+  categories: Category[] = [];
   newProduct = {
     _id: '',
     name: '',
-    imageUrl: '',
+    imageUrls: ['', '', '', ''], // Up to 4 images
     description: '',
     price: 0,
-    category: ''
+    category: '' // This will store the category ObjectId
   };
-  imageUploading = false;
-  imageSelected = false;
+  imageUploading: boolean[] = [false, false, false, false];
+  imageSelected: boolean[] = [false, false, false, false];
   showAddProductForm = false;
   editingProduct: Product | null = null;
   searchText = '';
@@ -67,14 +74,68 @@ barChartData: ChartData<'bar', number[], string> = {
   constructor(
     public auth: AuthService,
     private supplierService: SupplierService,
+    private productService: ProductService,
+    private categoryService: CategoryService,
     private http: HttpClient,
     // private productService: ProductService
   ) {}
 
   ngOnInit(): void {
+    this.loadCategories();
     this.loadProducts();
     this.loadProductStats();
     this.loadOrderStats();
+  }
+
+  loadCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (data: Category[]) => {
+        console.log('Supplier dashboard - categories from API:', data);
+        data.forEach((cat, index) => {
+          console.log(`Category ${index + 1}:`, {
+            name: cat.name,
+            isActive: cat.isActive,
+            isActiveType: typeof cat.isActive
+          });
+        });
+        
+        // Ensure isActive has a default value and filter for active categories
+        this.categories = data.map(cat => ({
+          ...cat,
+          isActive: cat.isActive !== undefined ? cat.isActive : true
+        })).filter(cat => cat.isActive);
+        
+        console.log('Filtered categories for supplier:', this.categories);
+      },
+      error: (error: any) => {
+        console.error('Error loading categories for supplier:', error);
+      }
+    });
+  }
+
+  // Handle category selection from the CategorySelector component
+  onCategorySelected(category: Category): void {
+    // The CategorySelector component will handle updating the ngModel
+    // This method can be used for additional logic if needed
+    console.log('Category selected:', category);
+  }
+
+  // Helper method to get category name from ObjectId or name
+  getCategoryName(categoryValue: any): string {
+    if (!categoryValue) return 'No Category';
+    
+    // If it's already a category object with name (from populated data)
+    if (typeof categoryValue === 'object' && categoryValue.name) {
+      return categoryValue.name;
+    }
+    
+    // If it's an ObjectId string, find the category name
+    if (typeof categoryValue === 'string') {
+      const category = this.categories.find(cat => cat._id === categoryValue || cat.name === categoryValue);
+      return category ? category.name : categoryValue;
+    }
+    
+    return 'Unknown Category';
   }
 
   loadProducts() {
@@ -106,17 +167,30 @@ barChartData: ChartData<'bar', number[], string> = {
     });
   }
   addProduct() {
-    // If an image was selected but not uploaded yet, prevent submit
-    if (this.imageSelected && (this.imageUploading || !this.newProduct.imageUrl)) {
-      alert('Please wait for the image to finish uploading.');
+    // Prevent submit if any image is uploading
+    if (this.imageUploading.some(uploading => uploading)) {
+      alert('Please wait for all images to finish uploading.');
       return;
     }
-    this.supplierService.addProduct(this.newProduct).subscribe(() => {
-      this.showAddProductForm = false;
-      this.newProduct = { _id: '', name: '', imageUrl: '', description: '', price: 0, category: '' };
-      this.imageUploading = false;
-      this.imageSelected = false;
-      this.loadProducts();
+    // Filter out empty image URLs before sending to backend
+    const filteredProduct = {
+      ...this.newProduct,
+      imageUrls: this.newProduct.imageUrls.filter(url => url && url.trim() !== '')
+    };
+    console.log('Sending product data:', filteredProduct);
+    this.supplierService.addProduct(filteredProduct).subscribe({
+      next: (response) => {
+        console.log('Product added successfully:', response);
+        this.showAddProductForm = false;
+        this.newProduct = { _id: '', name: '', imageUrls: ['', '', '', ''], description: '', price: 0, category: '' };
+        this.imageUploading = [false, false, false, false];
+        this.imageSelected = [false, false, false, false];
+        this.loadProducts();
+      },
+      error: (error) => {
+        console.error('Error adding product:', error);
+        alert('Failed to add product. Please try again.');
+      }
     });
   }
 
@@ -154,19 +228,20 @@ totalPages(): number {
 
   uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
+    const index = parseInt(input.getAttribute('data-index') || '0', 10);
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
     const formData = new FormData();
     formData.append('image', file);
-    this.imageUploading = true;
-    this.imageSelected = true;
+    this.imageUploading[index] = true;
+    this.imageSelected[index] = true;
     this.http.post<{ imageUrl: string }>(`${environment.apiUrl}/upload`, formData).subscribe({
       next: (res) => {
-        this.newProduct.imageUrl = res.imageUrl;
-        this.imageUploading = false;
+        this.newProduct.imageUrls[index] = res.imageUrl;
+        this.imageUploading[index] = false;
       },
       error: () => {
-        this.imageUploading = false;
+        this.imageUploading[index] = false;
         alert('Image upload failed. Please try again.');
       }
     });

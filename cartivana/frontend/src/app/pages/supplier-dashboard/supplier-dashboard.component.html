@@ -46,17 +46,32 @@
       <button class="btn btn-primary btn-sm" (click)="showAddProductForm = true">+ Add Product</button>
     </div>
   
-    <div *ngIf="showAddProductForm" class="card p-3 mb-4">
+    <div *ngIf="showAddProductForm" class="card p-3 mb-4" style="max-width:600px;margin:auto;">
       <h6>Add New Product</h6>
       <form (ngSubmit)="addProduct()">
         <input [(ngModel)]="newProduct.name" name="name" class="form-control mb-2" placeholder="Name" required>
-        <input type="file" (change)="uploadFile($event)" class="form-control mb-2" />
-
+        <div *ngFor="let img of newProduct.imageUrls; let i = index">
+          <label>Image {{i+1}}</label>
+          <input type="file" class="form-control mb-2" [attr.data-index]="i" (change)="uploadFile($event)" />
+          <div *ngIf="imageUploading[i]">
+            <span class="spinner-border spinner-border-sm me-2"></span> Uploading...
+          </div>
+          <img *ngIf="newProduct.imageUrls[i]" [src]="newProduct.imageUrls[i].startsWith('/uploads') ? environment.apiUrl.replace('/api','') + newProduct.imageUrls[i] : newProduct.imageUrls[i]" alt="Product Image" class="img-thumbnail mb-2" style="max-width: 120px;" />
+        </div>
         <textarea [(ngModel)]="newProduct.description" name="description" class="form-control mb-2" placeholder="Description"></textarea>
         <input [(ngModel)]="newProduct.price" name="price" class="form-control mb-2" type="number" placeholder="Price">
-        <input [(ngModel)]="newProduct.category" name="category" class="form-control mb-2" placeholder="Category">
-        <button type="submit" class="btn btn-success btn-sm" [disabled]="imageUploading || (imageSelected && !newProduct.imageUrl)">
-          <span *ngIf="imageUploading" class="spinner-border spinner-border-sm me-2"></span>
+        <div class="mb-2">
+          <label class="form-label">Category *</label>
+          <app-category-selector 
+            [(ngModel)]="newProduct.category" 
+            name="category"
+            [required]="true"
+            placeholder="Select a category"
+            (categorySelected)="onCategorySelected($event)">
+          </app-category-selector>
+        </div>
+        <button type="submit" class="btn btn-success btn-sm" [disabled]="asyncUploading">
+          <span *ngIf="asyncUploading" class="spinner-border spinner-border-sm me-2"></span>
           Submit
         </button>
         <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="showAddProductForm = false">Cancel</button>
@@ -67,50 +82,61 @@
         <h6>Edit Product</h6>
         <form (ngSubmit)="updateProduct()">
           <input [(ngModel)]="editingProduct.name" name="name" class="form-control mb-2" placeholder="Name" required>
-          <input type="file" (change)="uploadFile($event)" class="form-control mb-2" />
-
+          <div *ngFor="let img of editingProduct.imageUrls; let i = index">
+            <label>Image {{i+1}}</label>
+            <input type="file" class="form-control mb-2" [attr.data-index]="i" (change)="uploadFile($event)" />
+            <img *ngIf="editingProduct.imageUrls && editingProduct.imageUrls[i]" [src]="editingProduct.imageUrls[i] && editingProduct.imageUrls[i].startsWith('/uploads') ? environment.apiUrl.replace('/api','') + editingProduct.imageUrls[i] : editingProduct.imageUrls[i]" alt="Product Image" class="img-thumbnail mb-2" style="max-width: 120px;" />
+          </div>
           <textarea [(ngModel)]="editingProduct.description" name="description" class="form-control mb-2" placeholder="Description"></textarea>
           <input [(ngModel)]="editingProduct.price" name="price" class="form-control mb-2" type="number" placeholder="Price">
-          <input [(ngModel)]="editingProduct.category" name="category" class="form-control mb-2" placeholder="Category">
+          <div class="mb-2">
+            <label class="form-label">Category *</label>
+            <app-category-selector 
+              [(ngModel)]="editingProduct.category" 
+              name="category"
+              [required]="true"
+              placeholder="Select a category"
+              (categorySelected)="onCategorySelected($event)">
+            </app-category-selector>
+          </div>
           <button type="submit" class="btn btn-success btn-sm">Update</button>
           <button type="button" class="btn btn-outline-secondary btn-sm ms-2" (click)="editingProduct = null">Cancel</button>
         </form>
       </div>
       <input type="text" [(ngModel)]="searchText" placeholder="Search..." class="form-control mb-3">
 
-        <div *ngFor="let product of filteredProducts">
+    <div *ngFor="let product of filteredProducts">
         <!-- Product Card -->
-        <div class="d-flex justify-content-between">
+        <div class="d-flex align-items-center justify-content-between mb-2 p-2 bg-white rounded shadow-sm">
+          <div class="d-flex align-items-center gap-3">
             <div>
-              <h6>{{ product.name }}</h6>
-              <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+              <h6 class="mb-1">{{ product.name }}</h6>
+              <p class="text-muted mb-0">₹{{ product.price }} • {{ getCategoryName(product.category) }}</p>
             </div>
+            <span class="badge bg-success" *ngIf="product.status === 'approved'">Approved</span>
             <span class="badge bg-secondary" *ngIf="product.status === 'pending'">Pending</span>
-              <span class="badge bg-success" *ngIf="product.status === 'approved'">Approved</span>
-              <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>
-  
-            <div>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
-              <button class="btn btn-sm btn-outline-primary me-2" (click)="editProduct(product)">Edit</button>
-  
-            </div>
+            <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product._id)">Delete</button>
+            <button class="btn btn-sm btn-outline-primary" (click)="editProduct(product)">Edit</button>
           </div>
         </div>
-
-        <nav *ngIf="totalPages() > 1">
-        <ul class="pagination">
-            <li class="page-item" *ngFor="let i of [].constructor(totalPages()); let idx = index">
-            <button class="page-link" (click)="currentPage = idx + 1">{{ idx + 1 }}</button>
-            </li>
-        </ul>
-        </nav>
+    </div>
+    <nav *ngIf="totalPages() > 1">
+      <ul class="pagination">
+        <li class="page-item" *ngFor="let i of [].constructor(totalPages()); let idx = index">
+          <button class="page-link" (click)="currentPage = idx + 1">{{ idx + 1 }}</button>
+        </li>
+      </ul>
+    </nav>
 
     <!-- <div *ngIf="myProducts.length; else noProducts">
       <div class="card mb-3 p-3" *ngFor="let product of myProducts">
         <div class="d-flex justify-content-between">
           <div>
             <h6>{{ product.name }}</h6>
-            <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+            <p class="text-muted">₹{{ product.price }} • {{ getCategoryName(product.category) }}</p>
           </div>
           <span class="badge bg-secondary" *ngIf="product.status === 'pending'">Pending</span>
             <span class="badge bg-success" *ngIf="product.status === 'approved'">Approved</span>
@@ -130,7 +156,7 @@
           <div class="d-flex justify-content-between">
             <div>
               <h6>{{ product.name }}</h6>
-              <p class="text-muted">₹{{ product.price }} • {{ product.category }}</p>
+              <p class="text-muted">₹{{ product.price }} • {{ getCategoryName(product.category) }}</p>
             </div>
             
               <span class="badge bg-danger" *ngIf="product.status === 'rejected'">Rejected</span>

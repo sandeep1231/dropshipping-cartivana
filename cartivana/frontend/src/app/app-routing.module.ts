@@ -19,6 +19,8 @@ import { AdminOrdersComponent } from './pages/admin-orders/admin-orders.componen
 import { AdminOrderDetailsComponent } from './pages/admin-order-details/admin-order-details.component';
 import { MyOrderDetailsUserComponent } from './pages/my-order-details-user/my-order-details-user.component';
 import { MyOrdersUserComponent } from './pages/my-orders-user/my-orders-user.component';
+import { OrderConfirmationComponent } from './pages/order-confirmation/order-confirmation.component';
+import { CategoryManagementComponent } from './components/admin/category-management/category-management.component';
 
 const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -37,8 +39,14 @@ const routes: Routes = [
         component: AdminUsersComponent,
         canActivate: [RoleGuard],
         data: { role: 'admin' }
-      },
-      {
+    },
+    {
+        path: 'admin/categories',
+        component: CategoryManagementComponent,
+        canActivate: [RoleGuard],
+        data: { role: 'admin' }
+    },
+    {
         path: 'admin/overview',
         component: AdminDashboardOverviewComponent,
         canActivate: [RoleGuard],
@@ -66,7 +74,13 @@ const routes: Routes = [
         component: MyOrderDetailsUserComponent,
         canActivate: [AuthGuard]
       },
-      
+      {
+        path: 'order-confirmation',
+        component: OrderConfirmationComponent,
+        canActivate: [AuthGuard]
+      },
       
     { path: '**', component: NotFoundComponent }
-  ];
+];
+
+export { routes };

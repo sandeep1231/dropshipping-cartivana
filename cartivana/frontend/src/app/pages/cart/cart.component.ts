@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { Cart } from '../../models/cart.model';
+import { environment } from '../../../environments/environment';
 import { SpinnerComponent } from '../../components/spinner/spinner.component';
 
 @Component({
@@ -21,6 +22,18 @@ export class CartComponent implements OnInit {
   loadCart(): void {
     this.loading = true;
     this.cartService.getCart().subscribe(data => {
+      // Fix imageUrl for backend-served images in cart items
+      if (data && data.items) {
+        data.items = data.items.map((item: any) => ({
+          ...item,
+          product: {
+            ...item.product,
+            imageUrl: item.product.imageUrl && item.product.imageUrl.startsWith('/uploads')
+              ? environment.apiUrl.replace(/\/api$/, '') + item.product.imageUrl
+              : item.product.imageUrl
+          }
+        }));
+      }
       this.cart = data;
       this.loading = false;
     }, () => { this.loading = false; });

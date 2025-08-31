@@ -14,6 +14,15 @@ export class OrderService {
     return this.http.post<Order>(this.API_URL, orderData);
   }
 
+  // New method for direct purchase without cart
+  buyNow(productId: string, quantity: number, totalAmount: number): Observable<Order> {
+    const orderData = {
+      products: [{ product: productId, quantity }],
+      totalAmount
+    };
+    return this.http.post<Order>(this.API_URL, orderData);
+  }
+
   getMyOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.API_URL}/mine`);
   }

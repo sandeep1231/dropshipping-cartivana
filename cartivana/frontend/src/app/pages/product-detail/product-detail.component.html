@@ -7,25 +7,70 @@
   
 
 <div *ngIf="product" class="container product-detail-container mt-5 mb-5">
-  <div class="row align-items-center justify-content-center">
-    <div class="col-12 col-md-5 d-flex justify-content-center mb-4 mb-md-0">
-      <div class="product-image-wrapper shadow-lg">
-        <img [src]="product!.imageUrl || '/assets/images/placeholder.png'" class="img-fluid" alt="{{ product!.name }}">
+  <div class="row align-items-start justify-content-center g-4" style="max-width:1200px;margin:auto;">
+    <div class="col-12 col-md-5 d-flex flex-column align-items-center">
+      <div class="d-flex product-images-container gap-3 mb-3">
+        <!-- Thumbnails for all images (Left side vertical) -->
+        <div class="d-flex flex-column gap-2 thumbnail-container">
+          <img *ngFor="let img of product?.imageUrls; let i = index" 
+               [src]="img" 
+               class="img-thumbnail thumbnail-image" 
+               [class.active-thumbnail]="i === selectedImageIndex"
+               style="width:60px;height:60px;object-fit:cover;cursor:pointer;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06);" 
+               alt="{{ product.name }}" 
+               (click)="onThumbnailClick(i)">
+        </div>
+        
+        <!-- Main image (Right side) -->
+        <div class="product-image-wrapper shadow-lg position-relative flex-grow-1" style="background:#fff;">
+          <div class="d-flex flex-column align-items-center" style="width:100%;max-width:420px;margin:auto;">
+            <img [src]="product.imageUrls && product.imageUrls[selectedImageIndex] " 
+                 class="img-fluid product-main-img zoomable-img" 
+                 alt="{{ product.name }}" 
+                 (mousemove)="onImageMouseMove($event)" 
+                 (mouseleave)="onImageMouseLeave()" 
+                 [ngStyle]="zoomStyle" 
+                 style="max-width:100%;height:auto;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+            <div class="text-center mt-2">
+              <span class="badge bg-warning text-dark fs-6 px-3 py-2">Best Seller</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-heart"></i> Wishlist</button>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-share"></i> Share</button>
       </div>
     </div>
-    <div class="col-12 col-md-6">
-      <h2 class="fw-bold mb-2">{{ product!.name }}</h2>
-      <div class="mb-2">
+    <div class="col-12 col-md-7">
+      <h2 class="fw-bold mb-2 text-dark">{{ product!.name }}</h2>
+      <div class="mb-2 d-flex align-items-center gap-2">
         <span class="badge bg-primary bg-gradient me-2">{{ product!.category }}</span>
+        <span class="text-success fw-semibold">In Stock</span>
+        <span class="text-warning ms-2">&#9733; 4.5/5 (234 ratings)</span>
       </div>
-      <p class="mb-2">{{ product!.description }}</p>
-      <p class="text-muted small mb-3">{{ product!.details }}</p>
+      <h3 class="text-primary fw-bold mb-3">₹{{ product!.price | currency:'INR' }}</h3>
+      <div class="mb-3">
+        <span class="fw-semibold">Free delivery</span> <span class="text-muted">by tomorrow</span>
+      </div>
+      <div class="mb-3">
+        <span class="fw-semibold">Sold by:</span> <span class="text-muted">Cartivana Supplier</span>
+      </div>
+      <div class="mb-3">
+        <span class="fw-semibold">Offers:</span> <span class="text-success">10% off on first order</span>
+      </div>
       <div class="d-flex align-items-center mb-3 gap-3">
         <label class="me-2 mb-0">Qty:</label>
         <input type="number" [(ngModel)]="quantity" class="form-control form-control-sm" style="width: 60px;" min="1" />
-        <span class="ms-2 fw-semibold text-primary" style="min-width: 70px;">{{ product!.price | currency:'INR' }}</span>
       </div>
       <button class="btn btn-success add-to-cart-btn btn-lg px-5 py-2 mt-2" (click)="addToCart(product!._id, quantity)">Add to Cart</button>
+      <button class="btn btn-warning btn-lg px-5 py-2 mt-2 ms-2" (click)="buyNow(product!._id, quantity)">Buy Now</button>
+      <div class="mt-4">
+        <h5 class="fw-bold">Product Description</h5>
+        <p>{{ product!.description }}</p>
+        <h6 class="fw-bold mt-3">Details</h6>
+        <p class="text-muted small mb-3">{{ product!.details }}</p>
+      </div>
     </div>
   </div>
 

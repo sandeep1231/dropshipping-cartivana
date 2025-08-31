@@ -1,0 +1,137 @@
+<div class="hero-section">
+    <div class="container text-center">
+      <h1 class="di      <div class="col" *ngFor="let cat of categories">
+        <div class="cat-card text-center p-3 h-100">
+          <div class="cat-icon mb-2">
+            <ng-container [ngSwitch]="cat">
+              <span *ngSwitchCase="'Woodcraft'">🪵</span>
+              <span *ngSwitchCase="'Textiles'">🧵</span>
+              <span *ngSwitchCase="'Jewelry'">💎</span>
+              <span *ngSwitchCase="'Paintings'">🎨</span>
+              <span *ngSwitchDefault>📦</span>
+            </ng-container>
+          </div>
+          <h6>{{ cat }}</h6>
+          <a [routerLink]="['/products']" [queryParams]="{ category: cat }" class="stretched-link"></a>
+        </div>
+      </div> text-light animate__fadeInDown">Discover Authentic Odisha</h1>
+      <p class="lead text-light animate__fadeInUp">Premium handcrafted goods, straight from local artisans — no middlemen, no markups.</p>
+      <a routerLink="/products" class="btn btn-lg btn-primary mt-3 shadow-lg animate__pulse">Explore Products</a>
+    </div>
+  </div>
+  
+  <!-- Featured Products Carousel -->
+  <div *ngIf="featuredProducts.length" class="mt-5">
+    <h4 class="mb-4 text-center">197 Featured Products</h4>
+    <div class="d-flex justify-content-center">
+      <div id="featuredCarousel" class="carousel slide w-75" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <div
+            class="carousel-item"
+            *ngFor="let product of featuredProducts; let i = index"
+            [class.active]="i === 0"
+          >
+            <div class="row justify-content-center">
+              <div class="col-12 col-md-8">
+                <div class="card product-card h-100 mx-auto">
+                  <div class="product-img-wrapper d-flex align-items-center justify-content-center w-100" style="height: 180px;">
+                    <img [src]="(product.imageUrls && product.imageUrls.length > 0 ? (product.imageUrls[0].startsWith('/uploads') ? environment.apiUrl.replace('/api','') + product.imageUrls[0] : product.imageUrls[0]) : '/assets/images/placeholder.png')" class="card-img-top mx-auto d-block" [alt]="product.name" style="height: 100%; width: auto; max-width: 100%; object-fit: cover;" />
+                  </div>
+                  <div class="card-body d-flex flex-column align-items-center">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <div class="mt-auto w-100">
+                      <div class="d-flex align-items-center mb-3 justify-content-center gap-3">
+                        <label class="me-2 mb-0">Qty:</label>
+                        <input type="number" min="1" [(ngModel)]="quantities[product._id]"
+                          class="form-control form-control-sm" style="width: 60px;" />
+                        <span class="ms-2 fw-semibold text-primary" style="min-width: 70px;">{{ product.price | currency:'INR' }}</span>
+                      </div>
+                      <div class="d-flex gap-2 w-100 mt-2 justify-content-center">
+                        <button class="btn btn-success add-to-cart-btn flex-fill" (click)="addToCart(product._id, quantities[product._id] || 1)">Add to Cart</button>
+                        <button class="btn btn-warning flex-fill" (click)="buyNow(product._id, quantities[product._id] || 1)">Buy Now</button>
+                      </div>
+                      <div class="d-flex gap-2 w-100 mt-1 justify-content-center">
+                        <a [routerLink]="['/product', product._id]" class="btn btn-outline-primary w-100">View Details</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Why Shop Section -->
+  <section class="bg-light py-5 mt-5">
+    <div class="container text-center">
+      <h2 class="section-title mb-4">Why Shop with Cartivana?</h2>
+      <div class="row g-4 mt-4">
+        <div class="col-md-4">
+          <div class="icon-box mb-2"><i class="bi bi-patch-check-fill"></i></div>
+          <h6>Authenticity</h6>
+          <p class="small">Only Odisha artisans — ensuring originality, heritage, and fair pricing.</p>
+        </div>
+        <div class="col-md-4">
+          <div class="icon-box mb-2"><i class="bi bi-truck"></i></div>
+          <h6>Secure Delivery</h6>
+          <p class="small">Carefully packaged and shipped across India. Easy return within 5 days.</p>
+        </div>
+        <div class="col-md-4">
+          <div class="icon-box mb-2"><i class="bi bi-gem"></i></div>
+          <h6>Premium Quality</h6>
+          <p class="small">Curated for durability, aesthetics, and value. You'll feel the craftsmanship.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Categories -->
+  <section class="container my-5">
+    <h5 class="mb-4">Browse Categories</h5>
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+      <div class="col" *ngFor="let cat of ['Woodcraft', 'Textiles', 'Jewelry', 'Paintings']">
+        <div class="cat-card text-center p-3 h-100">
+          <div class="cat-icon mb-2">
+            <ng-container [ngSwitch]="cat">
+              <span *ngSwitchCase="'Woodcraft'">6cf</span>
+              <span *ngSwitchCase="'Textiles'">9f5</span>
+              <span *ngSwitchCase="'Jewelry'">48d</span>
+              <span *ngSwitchCase="'Paintings'">5bc</span>
+              <span *ngSwitchDefault>4c1</span>
+            </ng-container>
+          </div>
+          <h6>{{ cat }}</h6>
+          <a [routerLink]="['/products']" [queryParams]="{ category: cat }" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Newsletter -->
+  <section class="newsletter-section py-5 mt-5">
+    <div class="container text-center">
+      <h5 class="text-light mb-3">Stay Inspired by Odisha</h5>
+      <p class="text-light small">Get product collections, artisan stories, and offers — straight to your inbox.</p>
+      <form class="row justify-content-center g-2">
+        <div class="col-12 col-md-4">
+          <input type="email" class="form-control rounded-pill" placeholder="Your email address" required />
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-light rounded-pill px-4">Subscribe</button>
+        </div>
+      </form>
+      <p class="text-light mt-2 small">No spam. Unsubscribe anytime.</p>
+    </div>
+  </section>
+

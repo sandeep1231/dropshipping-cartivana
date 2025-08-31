@@ -7,17 +7,17 @@ export interface User {
   }
   
 export interface Product {
-  rejectionReason?: string; // was any
+  rejectionReason?: string;
   status?: string;
   _id: string;
   name: string;
   description: string;
   price: number;
-  imageUrl?: string;
+  imageUrls?: string[];
   category: string;
   supplier?: User;
   details?: string;
-  specs?: string[]; // Array of product specifications
+  specs?: string[];
   sku?: string;
 }
   

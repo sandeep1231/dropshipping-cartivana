@@ -15,7 +15,10 @@ const {
   updateProduct,
   getFeatured,
   getPendingProducts,
-  toggleFeatured
+  toggleFeatured,
+  getCategories,
+  getSearchSuggestions,
+  searchProducts
 } = require("../controllers/productController");
 
 const { allowRoles } = require("../middleware/roleMiddleware");
@@ -24,6 +27,9 @@ const { protect, isAdmin } = require('../middleware/authMiddleware');
 // Public routes
 router.get("/", getAllProducts);
 router.get("/featured", getFeatured);
+router.get("/categories", getCategories);
+router.get("/search/suggestions", getSearchSuggestions);
+router.get("/search", searchProducts);
 
 // Protected routes
 router.post("/", protect, allowRoles("admin", "supplier"), createProduct);

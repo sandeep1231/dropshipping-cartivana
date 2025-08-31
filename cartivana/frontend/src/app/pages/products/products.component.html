@@ -1,43 +1,518 @@
-
-<div class="container mt-4">
-  <h2 class="section-title mb-4"> Our Products</h2>
-
-  <!-- Filter Buttons -->
-  <div class="d-flex gap-3 flex-wrap mb-5 justify-content-center">
-    <button
-      *ngFor="let cat of categories"
-      (click)="filterByCategory(cat)"
-      class="btn btn-lg filter-btn px-4 py-2"
-      [ngClass]="{'btn-primary': selectedCategory === cat, 'btn-outline-primary': selectedCategory !== cat}">
-      {{ cat }}
-    </button>
-  </div>
-
-  <!-- Product Grid -->
-  <div class="row g-4 justify-content-center">
-    <div class="col-12 col-sm-6 col-lg-3 d-flex" *ngFor="let product of filteredProducts">
-      <div class="card product-card shadow-lg border-0 h-100 w-100 d-flex flex-column align-items-center">
-        <div class="product-img-wrapper d-flex align-items-center justify-content-center w-100">
-          <img [src]="product.imageUrl || '/assets/images/placeholder.png'" class="card-img-top mx-auto d-block" alt="{{ product.name }}">
-        </div>
-        <div class="card-body text-center d-flex flex-column justify-content-between w-100">
-          <h5 class="card-title mb-2">{{ product.name }}</h5>
-          <div class="d-flex align-items-center mb-3 justify-content-center gap-3">
-            <label class="me-2 mb-0">Qty:</label>
-            <input type="number" class="form-control form-control-sm" style="width: 60px;"
-                   [(ngModel)]="quantities[product._id]" min="1" />
-            <span class="ms-2 fw-semibold text-primary" style="min-width: 70px;">{{ product.price | currency:'INR' }}</span>
-          </div>
-          <div class="d-flex gap-2 w-100 mt-2">
-            <button class="btn btn-success add-to-cart-btn flex-fill" (click)="addToCart(product._id, quantities[product._id] || 1)">Add to Cart</button>
-            <a [routerLink]="['/product', product._id]" class="btn btn-outline-primary flex-fill">View</a>
+<div class="products-page">
+  <!-- Hero Section with Search -->
+  <div class="products-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Discover Amazing Products</h1>
+        <p class="hero-subtitle">Find exactly what you're looking for from our curated collection</p>
+        <div class="search-bar-container">
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon" (click)="performFullSearch()"></i>
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search products..." 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()"
+              (focus)="onSearchFocus()"
+              (keydown)="onSearchKeydown($event)"
+              autocomplete="off"
+            >
+            <button class="search-clear-btn" *ngIf="searchTerm" (click)="clearSearch()" title="Clear search">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            
+            <!-- Search Loader -->
+            <div class="search-loader" *ngIf="isSuggestionsLoading">
+              <div class="spinner-sm"></div>
+            </div>
+            
+            <!-- Search Suggestions Dropdown -->
+            <div class="search-suggestions" *ngIf="searchSuggestions.length > 0 && showSuggestions">
+              <div class="suggestion-item" 
+                   *ngFor="let suggestion of searchSuggestions; let i = index" 
+                   (click)="selectSuggestion(suggestion)"
+                   [class.highlighted]="i === highlightedSuggestionIndex"
+                   (mouseenter)="highlightedSuggestionIndex = i">
+                <i class="fas fa-search suggestion-icon"></i>
+                <span class="suggestion-text" [innerHTML]="highlightSearchTerm(suggestion)"></span>
+              </div>
+              
+              <!-- Popular Searches (when no search term) -->
+              <div class="popular-searches" *ngIf="!searchTerm && popularSearches.length > 0">
+                <div class="popular-header">Popular Searches</div>
+                <div class="suggestion-item" 
+                     *ngFor="let popular of popularSearches; let i = index" 
+                     (click)="selectSuggestion(popular)"
+                     [class.highlighted]="i === highlightedSuggestionIndex"
+                     (mouseenter)="highlightedSuggestionIndex = i">
+                  <i class="fas fa-fire suggestion-icon popular-icon"></i>
+                  <span class="suggestion-text">{{ popular }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="filteredProducts.length === 0" class="text-center text-muted mt-5">
-    <p>No products found in this category.</p>
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <!-- Mobile sidebar backdrop -->
+    <div class="sidebar-backdrop" [class.active]="sidebarOpen" (click)="toggleSidebar($event)"></div>
+    
+    <div class="row">
+      <!-- Sidebar Filters -->
+      <div class="col-lg-3 col-md-4 sidebar" [class.sidebar-open]="sidebarOpen">
+        <!-- Debug indicator -->
+        <div class="debug-indicator" *ngIf="sidebarOpen" style="position: absolute; top: 10px; right: 10px; background: red; color: white; padding: 5px; z-index: 3000; border-radius: 3px; font-size: 12px;">
+          SIDEBAR OPEN
+        </div>
+        <div class="filters-section">
+          <div class="filters-header">
+            <h3>Filters</h3>
+            <button 
+              class="sidebar-toggle d-lg-none" 
+              (click)="toggleSidebar($event)"
+              (touchstart)="toggleSidebar($event)"
+              type="button"
+              aria-label="Close filters"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Categories Filter - Tree Structure -->
+          <div class="filter-group">
+            <h4 class="filter-title">Categories</h4>
+            
+            <!-- Categories Filter Tree -->
+            <h6 class="filter-title">Categories</h6>
+            
+            <div class="category-tree" *ngIf="categoryTree && categoryTree.length > 0; else noCategories">
+              <div class="tree-node" *ngFor="let parentNode of categoryTree; trackBy: trackByFn">
+                <!-- Parent Category -->
+                <div class="parent-category">
+                  <div class="category-item">
+                    <button 
+                      class="expand-toggle"
+                      (click)="toggleCategoryExpansion(parentNode.category._id, $event)"
+                      (touchstart)="toggleCategoryExpansion(parentNode.category._id, $event)"
+                      [class.expanded]="expandedCategories[parentNode.category._id]"
+                      *ngIf="parentNode.children.length > 0"
+                      type="button"
+                      [attr.aria-label]="'Toggle ' + parentNode.category.name + ' subcategories'"
+                      [attr.aria-expanded]="expandedCategories[parentNode.category._id]"
+                    >
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <span class="expand-placeholder" *ngIf="parentNode.children.length === 0"></span>
+                    
+                    <label class="filter-checkbox">
+                      <input 
+                        type="checkbox"
+                        [checked]="selectedCategories[parentNode.category._id]"
+                        [indeterminate]="parentNode.isIndeterminate"
+                        (change)="onParentCategoryChange(parentNode, $event)"
+                        (click)="$event.stopPropagation()"
+                        [id]="'parent-' + parentNode.category._id"
+                      >
+                      <span class="checkmark"></span>
+                      <span class="category-name">{{ parentNode.category.name }}</span>
+                      <span class="child-count" *ngIf="parentNode.children.length > 0">
+                        ({{ parentNode.children.length }})
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <!-- Child Categories -->
+                  <div 
+                    class="children-container" 
+                    *ngIf="parentNode.children.length > 0 && expandedCategories[parentNode.category._id]"
+                  >
+                    <div class="child-category" *ngFor="let childNode of parentNode.children; trackBy: trackByFn">
+                      <label class="filter-checkbox child-checkbox">
+                        <input 
+                          type="checkbox"
+                          [checked]="selectedCategories[childNode.category._id]"
+                          (change)="onChildCategoryChange(parentNode, childNode, $event)"
+                          (click)="$event.stopPropagation()"
+                          [id]="'child-' + childNode.category._id"
+                        >
+                        <span class="checkmark"></span>
+                        <span class="category-name">{{ childNode.category.name }}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noCategories>
+              <div class="no-categories" style="padding: 20px; text-align: center; color: #666;">
+                <p>No categories available</p>
+                <p *ngIf="allCategories && allCategories.length > 0">Categories loaded but tree not built</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div class="filter-group">
+            <h4 class="filter-title">Price Range</h4>
+            <div class="price-range">
+              <div class="price-inputs">
+                <input 
+                  type="number" 
+                  placeholder="Min" 
+                  [(ngModel)]="priceRange.min" 
+                  (input)="onPriceRangeChange()"
+                  class="price-input"
+                >
+                <span>-</span>
+                <input 
+                  type="number" 
+                  placeholder="Max" 
+                  [(ngModel)]="priceRange.max" 
+                  (input)="onPriceRangeChange()"
+                  class="price-input"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating Filter -->
+          <div class="filter-group">
+            <h4 class="filter-title">Rating</h4>
+            <div class="rating-filters">
+              <label class="filter-checkbox" *ngFor="let rating of ratingOptions">
+                <input 
+                  type="checkbox" 
+                  [value]="rating" 
+                  [(ngModel)]="selectedRatings[rating]"
+                  (change)="onRatingChange()"
+                >
+                <span class="checkmark"></span>
+                <div class="rating-display">
+                  <i class="fas fa-star" *ngFor="let star of getStarArray(rating); trackBy: trackByIndex"></i>
+                  <span>& up</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Clear Filters -->
+          <button class="clear-filters-btn" (click)="clearFilters()">
+            <i class="fas fa-refresh"></i>
+            Clear All Filters
+          </button>
+
+          <!-- Apply Filters Button (Mobile Only) -->
+          <button class="apply-filters-btn d-lg-none" (click)="applyFiltersAndClose()">
+            <i class="fas fa-check"></i>
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Product Area -->
+      <div class="col-lg-9 col-md-8 main-content">
+        <!-- Toolbar -->
+        <div class="products-toolbar">
+          <div class="toolbar-left">
+            <button 
+              class="sidebar-toggle d-lg-none" 
+              (click)="toggleSidebar($event)"
+              (touchstart)="toggleSidebar($event)"
+              type="button"
+              aria-label="Open filters"
+            >
+              <i class="fas fa-filter"></i>
+              Filters
+            </button>
+            <div class="results-count">
+              <span>{{ totalResults }} products found</span>
+            </div>
+          </div>
+          
+          <div class="toolbar-right">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+              <button 
+                class="view-btn" 
+                [class.active]="viewMode === 'grid'" 
+                (click)="setViewMode('grid')"
+                title="Grid View"
+              >
+                <i class="fas fa-th">⊞</i>
+                <span class="view-text">Grid</span>
+              </button>
+              <button 
+                class="view-btn" 
+                [class.active]="viewMode === 'list'" 
+                (click)="setViewMode('list')"
+                title="List View"
+              >
+                <i class="fas fa-list">☰</i>
+                <span class="view-text">List</span>
+              </button>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="sort-dropdown" [class.open]="sortDropdownOpen">
+              <div class="sort-select-custom" (click)="toggleSortDropdown()">
+                <span class="selected-option">{{ getSortDisplayText() }}</span>
+                <i class="dropdown-arrow" [class.rotated]="sortDropdownOpen">▼</i>
+              </div>
+              <div class="dropdown-options" *ngIf="sortDropdownOpen">
+                <div class="option" 
+                     *ngFor="let option of sortOptions" 
+                     (click)="selectSortOption(option.value)"
+                     [class.selected]="sortBy === option.value">
+                  {{ option.label }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Grid/List -->
+        <div class="products-container" [class.list-view]="viewMode === 'list'">
+          <!-- Loading State -->
+          <div class="products-loading" *ngIf="isLoading">
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+              <p>Loading products...</p>
+            </div>
+          </div>
+          
+          <!-- Products Content (only show when not loading) -->
+          <div *ngIf="!isLoading">
+            <!-- Grid View -->
+            <div class="products-grid" *ngIf="viewMode === 'grid'">
+              <div class="product-card" *ngFor="let product of paginatedProducts; trackBy: trackByProduct">
+              <div class="product-image-container" [routerLink]="['/product', product._id]" style="cursor: pointer;">
+                <img 
+                  [src]="getProductImage(product)" 
+                  [alt]="product.name"
+                  class="product-image"
+                  (error)="onImageError($event)"
+                >
+                <div class="product-overlay">
+                  <button class="action-btn wishlist-btn" (click)="toggleWishlist(product); $event.stopPropagation()" [class.active]="isInWishlist(product._id)">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <button class="action-btn quick-view-btn" (click)="openQuickView(product); $event.stopPropagation()">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <div class="product-badge" *ngIf="product.isNew">New</div>
+              </div>
+              
+              <div class="product-content">
+                <h3 class="product-title" [routerLink]="['/product', product._id]" style="cursor: pointer;">{{ product.name }}</h3>
+                <p class="product-category" [routerLink]="['/product', product._id]" style="cursor: pointer;">{{ getCategoryName(product.category) }}</p>
+                
+                <!-- Rating -->
+                <div class="product-rating" *ngIf="product.rating">
+                  <div class="stars">
+                    <i class="fas fa-star" *ngFor="let star of getStarArray(product.rating); trackBy: trackByIndex"></i>
+                  </div>
+                  <span class="rating-text">({{ product.reviewCount || 0 }})</span>
+                </div>
+                
+                <div class="product-price-section">
+                  <div class="price-container">
+                    <span class="current-price">{{ product.price | currency:'INR' }}</span>
+                    <span class="original-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
+                      {{ product.originalPrice | currency:'INR' }}
+                    </span>
+                  </div>
+                  
+                  <div class="quantity-controls">
+                    <button class="qty-btn" (click)="decrementQuantity(product._id)">-</button>
+                    <span class="quantity">{{ quantities[product._id] || 1 }}</span>
+                    <button class="qty-btn" (click)="incrementQuantity(product._id)">+</button>
+                  </div>
+                </div>
+
+                <div class="product-actions">
+                  <button class="btn btn-primary add-to-cart-btn" (click)="addToCart(product._id, quantities[product._id] || 1)">
+                    <i class="fas fa-shopping-cart"></i>
+                    Add to Cart
+                  </button>
+                  <button class="btn btn-secondary buy-now-btn" (click)="buyNow(product._id, quantities[product._id] || 1)">
+                    <i class="fas fa-shopping-bag"></i>
+                    Buy Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- List View -->
+          <div class="products-list" *ngIf="viewMode === 'list'">
+            <div class="product-list-item" *ngFor="let product of paginatedProducts; trackBy: trackByProduct">
+              <div class="product-image-container" [routerLink]="['/product', product._id]" style="cursor: pointer;">
+                <img 
+                  [src]="getProductImage(product)" 
+                  [alt]="product.name"
+                  class="product-image"
+                  (error)="onImageError($event)"
+                >
+              </div>
+              
+              <div class="product-info">
+                <h3 class="product-title" [routerLink]="['/product', product._id]" style="cursor: pointer;">{{ product.name }}</h3>
+                <p class="product-category" [routerLink]="['/product', product._id]" style="cursor: pointer;">{{ getCategoryName(product.category) }}</p>
+                
+                <!-- Rating -->
+                <div class="product-rating" *ngIf="product.rating">
+                  <div class="stars">
+                    <i class="fas fa-star" *ngFor="let star of getStarArray(product.rating); trackBy: trackByIndex"></i>
+                  </div>
+                  <span class="rating-text">({{ product.reviewCount || 0 }})</span>
+                </div>
+
+                <p class="product-description" *ngIf="product.description" [routerLink]="['/product', product._id]" style="cursor: pointer;">
+                  {{ product.description | slice:0:120 }}{{ product.description && product.description.length > 120 ? '...' : '' }}
+                </p>
+              </div>
+
+              <div class="product-actions-list">
+                <div class="price-container">
+                  <span class="current-price">{{ product.price | currency:'INR' }}</span>
+                  <span class="original-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
+                    {{ product.originalPrice | currency:'INR' }}
+                  </span>
+                </div>
+                
+                <div class="quantity-controls">
+                  <button class="qty-btn" (click)="decrementQuantity(product._id)">-</button>
+                  <span class="quantity">{{ quantities[product._id] || 1 }}</span>
+                  <button class="qty-btn" (click)="incrementQuantity(product._id)">+</button>
+                </div>
+
+                <div class="action-buttons">
+                  <button class="btn btn-primary add-to-cart-btn" (click)="addToCart(product._id, quantities[product._id] || 1)">
+                    <i class="fas fa-shopping-cart"></i>
+                    Add to Cart
+                  </button>
+                  <button class="btn btn-secondary buy-now-btn" (click)="buyNow(product._id, quantities[product._id] || 1)">
+                    <i class="fas fa-shopping-bag"></i>
+                    Buy Now
+                  </button>
+                </div>
+              </div>
+            </div>            </div>
+
+            <!-- No Results -->
+            <div class="no-results" *ngIf="paginatedProducts.length === 0 && !isLoading">
+              <div class="no-results-content">
+                <i class="fas fa-search no-results-icon"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filter criteria</p>
+                <button class="btn btn-primary" (click)="clearFilters()">Clear Filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" *ngIf="totalPages > 1 && !isLoading">
+          <nav aria-label="Products pagination">
+            <ul class="pagination">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+              </li>
+              
+              <li class="page-item" 
+                  *ngFor="let page of getPageNumbers()" 
+                  [class.active]="page === currentPage">
+                <button class="page-link" (click)="goToPage(+page)" *ngIf="page !== '...'">
+                  {{ page }}
+                </button>
+                <span class="page-link" *ngIf="page === '...'">...</span>
+              </li>
+              
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+          
+          <div class="pagination-info">
+            <span>Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, totalResults) }} of {{ totalResults }} products</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick View Modal -->
+<div class="quick-view-modal" [class.active]="quickViewProduct" *ngIf="quickViewProduct" (click)="closeQuickView()">
+  <div class="quick-view-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeQuickView()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="quick-view-body">
+      <div class="quick-view-image">
+        <img [src]="getProductImage(quickViewProduct)" [alt]="quickViewProduct.name">
+      </div>
+      
+      <div class="quick-view-info">
+        <h2 class="product-title">{{ quickViewProduct.name }}</h2>
+        <p class="product-category">{{ getCategoryName(quickViewProduct.category) }}</p>
+        
+        <div class="product-rating" *ngIf="quickViewProduct.rating">
+          <div class="stars">
+            <i class="fas fa-star" *ngFor="let star of getStarArray(quickViewProduct.rating); trackBy: trackByIndex"></i>
+          </div>
+          <span class="rating-text">({{ quickViewProduct.reviewCount || 0 }} reviews)</span>
+        </div>
+        
+        <div class="price-container">
+          <span class="current-price">{{ quickViewProduct.price | currency:'INR' }}</span>
+          <span class="original-price" *ngIf="quickViewProduct.originalPrice && quickViewProduct.originalPrice > quickViewProduct.price">
+            {{ quickViewProduct.originalPrice | currency:'INR' }}
+          </span>
+        </div>
+        
+        <p class="product-description" *ngIf="quickViewProduct.description">
+          {{ quickViewProduct.description }}
+        </p>
+        
+        <div class="quantity-section">
+          <label>Quantity:</label>
+          <div class="quantity-controls">
+            <button class="qty-btn" (click)="decrementQuantity(quickViewProduct._id)">-</button>
+            <span class="quantity">{{ quantities[quickViewProduct._id] || 1 }}</span>
+            <button class="qty-btn" (click)="incrementQuantity(quickViewProduct._id)">+</button>
+          </div>
+        </div>
+        
+        <div class="quick-view-actions">
+          <button class="btn btn-primary add-to-cart-btn" (click)="addToCart(quickViewProduct._id, quantities[quickViewProduct._id] || 1)">
+            <i class="fas fa-shopping-cart"></i>
+            Add to Cart
+          </button>
+          <button class="btn btn-secondary buy-now-btn" (click)="buyNow(quickViewProduct._id, quantities[quickViewProduct._id] || 1)">
+            Buy Now
+          </button>
+          <button class="action-btn wishlist-btn" (click)="toggleWishlist(quickViewProduct)" [class.active]="isInWishlist(quickViewProduct._id)">
+            <i class="fas fa-heart"></i>
+          </button>
+          <a [routerLink]="['/product', quickViewProduct._id]" class="btn btn-outline" (click)="closeQuickView()">
+            View Full Details
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

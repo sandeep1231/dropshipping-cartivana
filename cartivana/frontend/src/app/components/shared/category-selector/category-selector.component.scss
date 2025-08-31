@@ -1,0 +1,228 @@
+@use '../../../../_variables.scss' as *;
+
+.category-selector {
+  position: relative;
+  width: 100%;
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .selector-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: #adb5bd;
+    }
+
+    &.open {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .selected-text {
+      flex: 1;
+      color: #495057;
+      font-size: 0.95rem;
+
+      &.placeholder {
+        color: #6c757d;
+      }
+    }
+
+    .dropdown-icon {
+      color: #6c757d;
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+
+    &.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .search-container {
+      position: relative;
+      padding: 0.75rem;
+      border-bottom: 1px solid #f8f9fa;
+
+      .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 0.85rem;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        outline: none;
+
+        &:focus {
+          border-color: #667eea;
+          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+      }
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: #6c757d;
+      gap: 0.75rem;
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    .categories-list {
+      max-height: 200px;
+      overflow-y: auto;
+
+      .category-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-bottom: 1px solid #f8f9fa;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        &.selected {
+          background-color: rgba(102, 126, 234, 0.1);
+          color: #667eea;
+        }
+
+        &.subcategory {
+          background-color: #f8f9fa;
+          border-left: 3px solid #dee2e6;
+          
+          .category-info .category-name {
+            color: #495057;
+            
+            .subcategory-indent {
+              color: #6c757d;
+              margin-right: 0.25rem;
+            }
+            
+            .parent-info {
+              font-size: 0.75rem;
+              color: #6c757d;
+              font-weight: normal;
+              margin-left: 0.5rem;
+            }
+          }
+        }
+
+        .category-info {
+          flex: 1;
+
+          .category-name {
+            display: block;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .category-description {
+            display: block;
+            color: #6c757d;
+            font-size: 0.8rem;
+            line-height: 1.3;
+          }
+        }
+
+        .check-icon {
+          color: #28a745;
+          font-size: 0.9rem;
+        }
+      }
+
+      .no-results,
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem;
+        color: #6c757d;
+        text-align: center;
+
+        i {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.5;
+        }
+
+        span {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

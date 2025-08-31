@@ -39,6 +39,8 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { OrderConfirmationComponent } from './pages/order-confirmation/order-confirmation.component';
 import { OrderSummaryStatusPipe } from './pipes/order-summary-status.pipe';
+import { CategoryManagementComponent } from './components/admin/category-management/category-management.component';
+import { CategorySelectorComponent } from './components/shared/category-selector/category-selector.component';
 
 
 
@@ -73,6 +75,8 @@ import { OrderSummaryStatusPipe } from './pipes/order-summary-status.pipe';
     FormsModule,
     ReactiveFormsModule,
     NgChartsModule,
+    CategoryManagementComponent,
+    CategorySelectorComponent,
     OrderSummaryStatusPipe,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
@@ -102,13 +106,18 @@ import { OrderSummaryStatusPipe } from './pipes/order-summary-status.pipe';
                           component: AdminOrdersComponent,
                           canActivate: [RoleGuard],
                           data: { role: 'admin' }
-                        },
-                  {
-                          path: 'admin/orders/:id',
-                          component: AdminOrderDetailsComponent,
-                          canActivate: [RoleGuard],
-                          data: { role: 'admin' }
-                        },
+                        },                        {
+                                path: 'admin/orders/:id',
+                                component: AdminOrderDetailsComponent,
+                                canActivate: [RoleGuard],
+                                data: { role: 'admin' }
+                              },
+                              {
+                                path: 'admin/categories',
+                                component: CategoryManagementComponent,
+                                canActivate: [RoleGuard],
+                                data: { role: 'admin' }
+                              },
                         {
                                 path: 'my-orders',
                                 component: MyOrdersUserComponent,

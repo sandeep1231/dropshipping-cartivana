@@ -1,0 +1,70 @@
+<div class="category-selector" [class.disabled]="disabled">
+  <div class="selector-input" (click)="toggleDropdown()" [class.open]="isOpen">
+    <span class="selected-text" [class.placeholder]="!selectedCategory">
+      {{ getDisplayText() }}
+    </span>
+    <i class="fas fa-chevron-down dropdown-icon" [class.rotated]="isOpen"></i>
+  </div>
+
+  <div class="dropdown-menu" [class.show]="isOpen" *ngIf="isOpen">
+    <!-- Search Input -->
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Search categories..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        (keydown)="onKeydown($event)"
+        #searchInput
+      >
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <span>Loading categories...</span>
+    </div>
+
+    <!-- Categories List -->
+    <div class="categories-list" *ngIf="!isLoading">
+      <div 
+        class="category-item" 
+        [class.selected]="selectedCategory?._id === category._id"
+        [class.subcategory]="category.parentCategory"
+        *ngFor="let category of filteredCategories; trackBy: trackByCategory"
+        (click)="selectCategory(category)"
+      >
+        <div class="category-info">
+          <span class="category-name">
+            <span *ngIf="category.parentCategory" class="subcategory-indent">└─ </span>
+            {{ category.name }}
+            <span *ngIf="category.parentCategory" class="parent-info">
+              ({{ getParentCategoryName(category.parentCategory) }})
+            </span>
+          </span>
+          <small class="category-description" *ngIf="category.description">
+            {{ category.description }}
+          </small>
+        </div>
+        <i class="fas fa-check check-icon" *ngIf="selectedCategory?._id === category._id"></i>
+      </div>
+
+      <!-- No Results -->
+      <div class="no-results" *ngIf="filteredCategories.length === 0 && searchTerm">
+        <i class="fas fa-search"></i>
+        <span>No categories found for "{{ searchTerm }}"</span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="categories.length === 0 && !searchTerm">
+        <i class="fas fa-tags"></i>
+        <span>No categories available</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="dropdown-backdrop" *ngIf="isOpen" (click)="closeDropdown()"></div>
+</div>
